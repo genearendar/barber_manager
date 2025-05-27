@@ -1,8 +1,12 @@
-export default function QueuePage() {
+import { getActiveQueue } from "@/utils/supabase/queries";
+import QueueContainer from "@/components/custom/queue-container";
+export default async function QueuePage() {
+  const queueData = await getActiveQueue();
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
         <h1>Live queue is publically displayed here</h1>
+        <QueueContainer queueData={queueData} />
       </div>
     </div>
   );
