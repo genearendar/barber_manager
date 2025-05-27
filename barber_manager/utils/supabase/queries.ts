@@ -1,5 +1,6 @@
-import { createClient } from "@/utils/supabase/server"; // Adjust this import to your server-side Supabase client
-import { QueueEntry } from "@/types/db"; // Import your defined QueueEntry type
+import { createClient } from "@/utils/supabase/server";
+import { QueueEntry } from "@/types/db";
+import { revalidatePath } from "next/cache";
 
 /**
  * Fetches the queue entries that are currently 'waiting' or 'in_progress'.
