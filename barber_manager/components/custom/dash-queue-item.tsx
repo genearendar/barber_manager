@@ -1,13 +1,52 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { QueueEntry, Barber } from "@/types/db";
+import { useState, ChangeEvent } from "react";
+import { assignBarberToQueueEntry } from "@/utils/supabase/actions";
+
 export default function DashQueueItem({
   person,
   staffData,
 }: {
-  person: QueueEntry;
+  person: QueueEntry; // Assuming person.id is string and person might have barber_id: string | null
   staffData: Barber[] | null;
 }) {
+  const [selectedBarberId, setSelectedBarberId] = useState<number | null>(
+    person.barber_id
+  );
+  const handleBarberSelectionChange = async (
+    event: ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newSelectedBarberId =
+      Number(event.target.value) > 0 ? Number(event.target.value) : null;
+    const previousSelectedBarberId = selectedBarberId; // Store current state value
+
+    setSelectedBarberId(newSelectedBarberId); // Optimistically update UI
+
+    try {
+      console.log(
+        `Attempting to assign barber ${newSelectedBarberId} to person ${person.id}`
+      );
+      const result = await assignBarberToQueueEntry(
+        person.id as number,
+        newSelectedBarberId as number
+      );
+      console.log("Assignment result:", result);
+
+      if (!result.success) {
+        // Revert on failure
+        alert(
+          "Failed to assign barber: " + (result.message || "Unknown error")
+        );
+        setSelectedBarberId(previousSelectedBarberId);
+      }
+    } catch (error) {
+      console.error("Error calling assignBarberToQueueEntry:", error);
+      alert("An unexpected error occurred while assigning the barber.");
+      setSelectedBarberId(previousSelectedBarberId); // Revert on error
+    }
+  };
+
   return (
     <div className="flex gap-2">
       <div
@@ -22,9 +61,20 @@ export default function DashQueueItem({
         <p className="text-xs text-right">{person.status}</p>
       </div>
       <div className="">
-        <button className="bg-accent text-sm p-3 px-5 rounded-md">
-          Assign
-        </button>
+        <p className="text-sm">Assign Barber:</p>
+        <select
+          className="bg-accent text-sm p-3 px-5 rounded-md w-full"
+          value={selectedBarberId ? selectedBarberId : ""}
+          onChange={handleBarberSelectionChange}
+        >
+          <option value="">-- Select Barber --</option>
+          {staffData &&
+            staffData.map((barber) => (
+              <option key={barber.id} value={barber.id as number}>
+                {barber.first_name}
+              </option>
+            ))}
+        </select>
       </div>
     </div>
   );

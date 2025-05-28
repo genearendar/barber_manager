@@ -3,6 +3,7 @@ import { AnyARecord } from "node:dns";
 import { createClient } from "./server";
 import { revalidatePath } from "next/cache";
 
+// Add a new queue entry
 export async function addToQueue(formData: FormData): Promise<any> {
   const supabase = await createClient();
 
@@ -53,5 +54,31 @@ export async function addToQueue(formData: FormData): Promise<any> {
     return {
       error: "An unexpected error occurred",
     };
+  }
+}
+
+// Assign a barber to a queue entry
+export async function assignBarberToQueueEntry(
+  queueEntryId: number,
+  barberId: number
+): Promise<any> {
+  // Assign barberId to null in case it's not provided
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("queue")
+      .update({ barber_id: barberId })
+      .eq("id", queueEntryId)
+      .select();
+    if (error) {
+      console.error("Error updating barber:", error);
+      return { success: false, message: "Failed to assign barber." };
+    }
+
+    revalidatePath("/protected/dashboard");
+    return { success: true, message: "Barber assigned successfully." };
+  } catch (error) {
+    console.error("Error assigning barber:", error);
+    return { success: false, message: "Failed to assign barber." };
   }
 }
