@@ -5,10 +5,10 @@ export default async function DashboardPage() {
   const queueData = await getAllQueue();
   const staffData = await getStaff();
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
+    <div className="flex flex-col gap-12">
       <div className="w-full">
         <h1>Barbers dashboard here</h1>
-        <DashQueueContainer queueData={queueData} />
+        <DashQueueContainer queueData={queueData} staffData={staffData} />
       </div>
     </div>
   );

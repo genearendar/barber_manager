@@ -5,7 +5,7 @@ export type QueueEntry = {
   status: "waiting" | "in progress" | "finished" | "cancelled";
   started_at: string | null;
   finished_at: string | null;
-  barber_name: string | null;
+  barber_id: number | null;
   // client_id: string | null;
 };
 
