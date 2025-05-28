@@ -2,7 +2,7 @@ export type QueueEntry = {
   id: number;
   created_at: string;
   name: string;
-  status: "waiting" | "in_progress" | "finished" | "cancelled"; // Use your ENUM type
+  status: "waiting" | "in progress" | "finished" | "cancelled";
   started_at: string | null;
   finished_at: string | null;
   barber_name: string | null;

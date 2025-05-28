@@ -4,7 +4,6 @@ export default function QueueContainer({
 }: {
   queueData: QueueEntry[] | null;
 }) {
-  console.log(queueData);
   const queueEntries = queueData?.map((person) => {
     return (
       <div key={person.id} className="bg-accent text-sm p-3 px-5 rounded-md">
