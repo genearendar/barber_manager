@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { QueueEntry } from "@/types/db";
-import { revalidatePath } from "next/cache";
+import { Barber } from "@/types/db";
 
 /**
  * Fetches the queue entries that are currently 'waiting' or 'in_progress'.
@@ -24,6 +24,14 @@ export async function getActiveQueue(): Promise<QueueEntry[] | null> {
     return null;
   }
   // Ensure 'queue' is an array of the correct type
-  console.log(queue);
   return queue as QueueEntry[];
+}
+
+export async function getStaff(): Promise<Barber[] | null> {
+  const supabase = await createClient();
+  const { data: staff, error } = await supabase.from("staff").select("id, first_name, last_name, status");
+  if (error) {
+    console.error("Error fetching staff:", error.message);
+  }
+  return staff;
 }
