@@ -5,6 +5,7 @@ import { QueueEntry, Barber } from "@/types/db";
 import { useState, ChangeEvent } from "react";
 import { assignBarberToQueueEntry } from "@/utils/supabase/actions";
 import DashStartButton from "./dash-start-button";
+import DashCancelButton from "./dash-cancel-button";
 
 export default function DashQueueTableRow({
   queueEntry,
@@ -71,7 +72,7 @@ export default function DashQueueTableRow({
           onChange={handleBarberSelectionChange}
           disabled={queueEntry.status !== "waiting"}
         >
-          <option value="">-- Select Barber --</option>
+          <option value="">-- No barber assigned --</option>
           {staffData &&
             staffData.map((barber) => (
               <option key={barber.id} value={barber.id as number}>
@@ -81,13 +82,16 @@ export default function DashQueueTableRow({
         </select>
       </TableCell>
       <TableCell className="w-1/5 font-medium">
-        <div className="flex gap-10">
+        <div className="flex gap-6">
           <DashStartButton
             queueEntryId={queueEntry.id}
             status={queueEntry.status}
             selectedBarberId={selectedBarberId}
           />
-          <button>Cancel</button>
+          <DashCancelButton
+            queueEntryId={queueEntry.id}
+            status={queueEntry.status}
+          />
         </div>
       </TableCell>
     </TableRow>

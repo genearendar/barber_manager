@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { toggleServiceStatus } from "@/utils/supabase/actions";
 
@@ -11,8 +12,8 @@ export default function DashStartButton({
   status: string;
   selectedBarberId: number | null;
 }) {
-  function handleClick() {
-    toggleServiceStatus(queueEntryId, status);
+  async function handleClick() {
+    await toggleServiceStatus(queueEntryId, status);
   }
   let buttonText = "Start";
   if (status === "in progress") {
@@ -30,7 +31,11 @@ export default function DashStartButton({
   }
   return (
     <Button
-      className="w-40"
+      className={cn(
+        "w-40 bg-green-600 hover:bg-green-500",
+        status === "cancelled" && "bg-red-300",
+        status === "finished" && "bg-blue-300"
+      )}
       variant="default"
       onClick={handleClick}
       disabled={disabled}

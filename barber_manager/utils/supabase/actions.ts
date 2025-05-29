@@ -114,3 +114,25 @@ export async function toggleServiceStatus(
     return { success: false, message: "Failed to update status." };
   }
 }
+
+// Cancel query item
+export async function cancelQueueEntry(queueEntryId: number): Promise<any> {
+  const supabase = await createClient();
+  try {
+    const { data, error } = await supabase
+      .from("queue")
+      .update({ status: "cancelled" })
+      .eq("id", queueEntryId)
+      .select();
+    if (error) {
+      console.error("Error updating status:", error);
+      return { success: false, message: "Failed to update status." };
+    }
+    revalidatePath("/protected/dashboard");
+    revalidatePath("/queue");
+    return { success: true, message: "Entry cancelled successfully." };
+  } catch (error) {
+    console.error("Error starting service:", error);
+    return { success: false, message: "Failed to update status." };
+  }
+}
