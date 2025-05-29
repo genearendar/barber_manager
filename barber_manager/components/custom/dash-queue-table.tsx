@@ -17,12 +17,12 @@ export default function DashQueueTable({
   queueData: QueueEntry[] | null;
   staffData: Barber[] | null;
 }) {
-  const queueEntries = queueData?.map((person) => {
+  const queueEntries = queueData?.map((queueEntry) => {
     return (
       <DashQueueTableRow
-        person={person}
+        queueEntry={queueEntry}
         staffData={staffData}
-        key={person.id}
+        key={queueEntry.id}
       />
     );
   });
