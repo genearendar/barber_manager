@@ -84,3 +84,33 @@ export async function assignBarberToQueueEntry(
     return { success: false, message: "Failed to assign barber." };
   }
 }
+
+// Start and finish service
+export async function toggleServiceStatus(
+  queueEntryId: number,
+  status: string
+): Promise<any> {
+  try {
+    const supabase = await createClient();
+    const statusToUpdate =
+      status === "in_progress" ? "finished" : "in_progress";
+    const { data, error } = await supabase
+      .from("queue")
+      .update({ status: statusToUpdate })
+      .eq("id", queueEntryId)
+      .select();
+    if (error) {
+      console.error("Error updating status:", error);
+      return { success: false, message: "Failed to update status." };
+    }
+    revalidatePath("/protected/dashboard");
+    revalidatePath("/queue");
+    return {
+      success: true,
+      message: "Status updated successfully: " + statusToUpdate,
+    };
+  } catch (error) {
+    console.error("Error starting service:", error);
+    return { success: false, message: "Failed to update status." };
+  }
+}
