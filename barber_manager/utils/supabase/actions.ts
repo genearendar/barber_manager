@@ -41,9 +41,11 @@ export async function addToQueue(formData: FormData): Promise<any> {
       };
     }
 
-    // Revalidate the queue page to show updated data
+    // Revalidate the page to show updated data
+    console.log("Revalidating paths...");
     revalidatePath("/queue");
-    revalidatePath("/dashboard");
+    revalidatePath("/protected/dashboard");
+    console.log("Revalidation completed.");
 
     return {
       success: true,
