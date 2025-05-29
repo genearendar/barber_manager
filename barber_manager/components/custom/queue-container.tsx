@@ -2,6 +2,7 @@
 import { QueueEntry } from "@/types/db";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { cn } from "@/lib/utils";
 export default function QueueContainer({
   queueData,
 }: {
@@ -33,6 +34,15 @@ export default function QueueContainer({
             setQueueEntries((prevQueueEntries) =>
               prevQueueEntries?.filter((entry) => entry.id !== payload.old.id)
             );
+          } else if (payload.eventType === "UPDATE") {
+            console.log("Entry updated:", payload.new);
+            setQueueEntries((prevQueueEntries) =>
+              prevQueueEntries?.map((entry) => {
+                return entry.id === payload.new.id
+                  ? (payload.new as QueueEntry)
+                  : entry;
+              })
+            );
           }
         }
       )
@@ -42,11 +52,21 @@ export default function QueueContainer({
     };
   }, []);
 
-  const queueElements = queueEntries?.map((person) => {
+  const queueElements = queueEntries?.map((entry) => {
+    // Extra check to filter out entries that are not waiting or in progress
+    if (entry.status !== "waiting" && entry.status !== "in progress")
+      return null;
     return (
-      <div key={person.id} className="bg-accent text-sm p-3 px-5 rounded-md">
-        <p className="text-xl">{person.name}</p>
-        <p className="text-xs text-right">Wait time: 15 minutes</p>
+      <div
+        key={entry.id}
+        className={cn(
+          "w-96 bg-accent text-sm p-3 px-5 rounded-md",
+          entry.status === "waiting" ? "bg-yellow-500" : "bg-green-500"
+        )}
+      >
+        <p className="text-2xl">{entry.name}</p>
+        <p>{entry.status}</p>
+        <p className="text-md text-right">Wait time: 15 minutes</p>
       </div>
     );
   });

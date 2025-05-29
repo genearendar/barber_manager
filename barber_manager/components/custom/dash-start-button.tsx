@@ -29,8 +29,12 @@ export default function DashStartButton({
   if (status === "finished" || status === "cancelled" || !selectedBarberId) {
     disabled = true;
   }
+  let visible = true;
+  if (status === "finished" || status === "cancelled") {
+    visible = false;
+  }
   return (
-    <Button
+    visible &&<Button
       className={cn(
         "w-40 bg-green-600 hover:bg-green-500",
         status === "cancelled" && "bg-red-300",
