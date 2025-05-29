@@ -1,5 +1,5 @@
 import { getAllQueue, getStaff } from "@/utils/supabase/queries";
-import DashQueueContainer from "@/components/custom/dash-queue-container";
+import DashQueueTable from "@/components/custom/dash-queue-table";
 
 export default async function DashboardPage() {
   const queueData = await getAllQueue();
@@ -8,7 +8,7 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-12">
       <div className="w-full">
         <h1>Barbers dashboard here</h1>
-        <DashQueueContainer queueData={queueData} staffData={staffData} />
+        <DashQueueTable queueData={queueData} staffData={staffData} />
       </div>
     </div>
   );

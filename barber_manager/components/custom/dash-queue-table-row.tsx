@@ -1,14 +1,15 @@
 "use client";
 import { cn } from "@/lib/utils";
+import { TableCell, TableRow } from "@/components/ui/table";
 import { QueueEntry, Barber } from "@/types/db";
 import { useState, ChangeEvent } from "react";
 import { assignBarberToQueueEntry } from "@/utils/supabase/actions";
 
-export default function DashQueueItem({
+export default function DashQueueTableRow({
   person,
   staffData,
 }: {
-  person: QueueEntry; // Assuming person.id is string and person might have barber_id: string | null
+  person: QueueEntry;
   staffData: Barber[] | null;
 }) {
   const [selectedBarberId, setSelectedBarberId] = useState<number | null>(
@@ -48,24 +49,26 @@ export default function DashQueueItem({
   };
 
   return (
-    <div className="flex gap-2">
-      <div
-        className={cn("flex-1 text-sm p-3 px-5 rounded-md", {
-          "bg-yellow-500": person.status === "waiting",
-          "bg-green-500": person.status === "in progress",
-          "bg-blue-500": person.status === "finished",
-          "bg-red-500": person.status === "cancelled",
-        })}
-      >
-        <p className="text-xl">{person.name}</p>
-        <p className="text-xs text-right">{person.status}</p>
-      </div>
-      <div className="">
-        <p className="text-sm">Assign Barber:</p>
+    <TableRow>
+      <TableCell className="w-1/5 font-medium">{person.name}</TableCell>
+      <TableCell className="w-1/5 font-medium">
+        <span
+          className={cn("block w-24 p-2 rounded-md text-center", {
+            "bg-yellow-500": person.status === "waiting",
+            "bg-green-500": person.status === "in progress",
+            "bg-blue-500": person.status === "finished",
+            "bg-red-500": person.status === "cancelled",
+          })}
+        >
+          {person.status}
+        </span>
+      </TableCell>
+      <TableCell className="w-1/5 font-medium">
         <select
           className="bg-accent text-sm p-3 px-5 rounded-md w-full"
           value={selectedBarberId ? selectedBarberId : ""}
           onChange={handleBarberSelectionChange}
+          disabled={person.status !== "waiting"}
         >
           <option value="">-- Select Barber --</option>
           {staffData &&
@@ -75,7 +78,8 @@ export default function DashQueueItem({
               </option>
             ))}
         </select>
-      </div>
-    </div>
+      </TableCell>
+      <TableCell className="w-1/5 font-medium"><div className="flex gap-10"><button>Start</button><button>Cancel</button></div></TableCell>
+    </TableRow>
   );
 }
