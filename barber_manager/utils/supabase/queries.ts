@@ -3,11 +3,11 @@ import { QueueEntry } from "@/types/db";
 import { Barber } from "@/types/db";
 
 /**
- * Fetches the queue entries that are currently 'waiting' or 'in_progress'.
+ * Fetches the queue entries that are currently 'waiting'.
  * The results are ordered by their creation timestamp in ascending order.
  */
 export async function getActiveQueue(): Promise<QueueEntry[] | null> {
-  const supabase = await createClient(); // Initialize your server-side Supabase client
+  const supabase = await createClient();
 
   // Select all necessary columns
   const { data: queue, error } = await supabase
@@ -18,13 +18,13 @@ export async function getActiveQueue(): Promise<QueueEntry[] | null> {
 
   if (error) {
     console.error("Error fetching active queue:", error.message);
-    // or return an empty array/null. Returning null is generally safer for UI.
     return null;
   }
   // Ensure 'queue' is an array of the correct type
   return queue as QueueEntry[];
 }
 
+// Fetch all queue entries
 export async function getAllQueue(): Promise<QueueEntry[] | null> {
   const supabase = await createClient(); // Initialize your server-side Supabase client
 
@@ -43,11 +43,13 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
   return queue as QueueEntry[];
 }
 
+// Fetch all current staff
 export async function getStaff(): Promise<Barber[] | null> {
   const supabase = await createClient();
   const { data: staff, error } = await supabase
     .from("staff")
-    .select("id, first_name, last_name, status");
+    .select("id, first_name, last_name, status")
+    .eq("is_current", true);
   if (error) {
     console.error("Error fetching staff:", error.message);
   }
