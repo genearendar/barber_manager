@@ -13,7 +13,7 @@ export async function getActiveQueue(): Promise<QueueEntry[] | null> {
   const { data: queue, error } = await supabase
     .from("queue")
     .select("id, name, created_at, status, started_at, finished_at, barber_id") // Select all columns from your table
-    .in("status", ["waiting", "in progress"]) // Filter by active statuses
+    .in("status", ["waiting"]) // Filter by status
     .order("created_at", { ascending: true }); // Order by creation time
 
   if (error) {

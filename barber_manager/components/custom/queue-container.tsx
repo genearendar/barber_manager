@@ -54,8 +54,7 @@ export default function QueueContainer({
 
   const queueElements = queueEntries?.map((entry) => {
     // Extra check to filter out entries that are not waiting or in progress
-    if (entry.status !== "waiting" && entry.status !== "in progress")
-      return null;
+    if (entry.status !== "waiting") return null;
     return (
       <div
         key={entry.id}
