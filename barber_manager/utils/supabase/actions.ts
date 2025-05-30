@@ -92,9 +92,11 @@ export async function toggleServiceStatus(
     const supabase = await createClient();
     const statusToUpdate =
       status === "in progress" ? "finished" : "in progress";
+    const timeStampToUpdate =
+      statusToUpdate === "in progress" ? "started_at" : "finished_at";
     const { data, error } = await supabase
       .from("queue")
-      .update({ status: statusToUpdate })
+      .update({ status: statusToUpdate, [timeStampToUpdate]: new Date() })
       .eq("id", queueEntryId)
       .select();
     if (error) {
