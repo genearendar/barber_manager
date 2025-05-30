@@ -44,7 +44,7 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
 }
 
 // Fetch all current staff
-export async function getStaff(): Promise<Barber[] | null> {
+export async function getAllCurrentStaff(): Promise<Barber[] | null> {
   const supabase = await createClient();
   const { data: staff, error } = await supabase
     .from("staff")
@@ -56,3 +56,4 @@ export async function getStaff(): Promise<Barber[] | null> {
   }
   return staff;
 }
+

@@ -1,9 +1,9 @@
-import { getAllQueue, getStaff } from "@/utils/supabase/queries";
+import { getAllQueue, getAllCurrentStaff } from "@/utils/supabase/queries";
 import DashQueueTable from "@/components/custom/dash-queue-table";
 
 export default async function DashboardPage() {
   const queueData = await getAllQueue();
-  const staffData = await getStaff();
+  const staffData = await getAllCurrentStaff();
   return (
     <div className="flex flex-col gap-12">
       <div className="w-full">

@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { getStaff } from "@/utils/supabase/queries";
+import { getAllCurrentStaff } from "@/utils/supabase/queries";
 import AdminStaffContainer from "@/components/custom/admin-staff-container";
 
 export default async function ProtectedPage() {
@@ -8,7 +8,7 @@ export default async function ProtectedPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const staffData = await getStaff();
+  const staffData = await getAllCurrentStaff();
   const staffElements = staffData?.map((staff) => (
     <AdminStaffContainer key={staff.id} staff={staff} />
   ));
