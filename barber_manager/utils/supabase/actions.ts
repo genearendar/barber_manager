@@ -43,7 +43,7 @@ export async function addToQueue(formData: FormData): Promise<any> {
 
     // Revalidate the page to show updated data
     revalidatePath("/queue");
-    revalidatePath("/protected/dashboard");
+    revalidatePath("/admin/dashboard");
 
     return {
       success: true,
@@ -75,7 +75,7 @@ export async function assignBarberToQueueEntry(
       return { success: false, message: "Failed to assign barber." };
     }
 
-    revalidatePath("/protected/dashboard");
+    revalidatePath("/admin/dashboard");
     return { success: true, message: "Barber assigned successfully." };
   } catch (error) {
     console.error("Error assigning barber:", error);
@@ -101,7 +101,7 @@ export async function toggleServiceStatus(
       console.error("Error updating status:", error);
       return { success: false, message: "Failed to update status." };
     }
-    revalidatePath("/protected/dashboard");
+    revalidatePath("/admin/dashboard");
     revalidatePath("/queue");
     return {
       success: true,
@@ -126,7 +126,7 @@ export async function cancelQueueEntry(queueEntryId: number): Promise<any> {
       console.error("Error updating status:", error);
       return { success: false, message: "Failed to update status." };
     }
-    revalidatePath("/protected/dashboard");
+    revalidatePath("/admin/dashboard");
     revalidatePath("/queue");
     return { success: true, message: "Entry cancelled successfully." };
   } catch (error) {
