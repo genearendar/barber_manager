@@ -136,3 +136,32 @@ export async function cancelQueueEntry(queueEntryId: number): Promise<any> {
     return { success: false, message: "Failed to update status." };
   }
 }
+
+// Toggle staff status
+export async function toggleStaffStatus(
+  staffId: number,
+  status: string
+): Promise<any> {
+  try {
+    const supabase = await createClient();
+    const statusToUpdate =
+      status === "onsite" ? "offsite" : "onsite";
+    const { data, error } = await supabase
+      .from("staff")
+      .update({ status: statusToUpdate,})
+      .eq("id", staffId)
+      .select();
+    if (error) {
+      console.error("Error updating staff status:", error);
+      return { success: false, message: "Failed to update staff status." };
+    }
+    revalidatePath("/admin");
+    return {
+      success: true,
+      message: "Staff status updated successfully: " + statusToUpdate,
+    };
+  } catch (error) {
+    console.error("Error updating status:", error);
+    return { success: false, message: "Failed to update status." };
+  }
+}

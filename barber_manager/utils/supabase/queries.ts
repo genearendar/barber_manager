@@ -49,7 +49,8 @@ export async function getStaff(): Promise<Barber[] | null> {
   const { data: staff, error } = await supabase
     .from("staff")
     .select("id, first_name, last_name, status")
-    .eq("is_current", true);
+    .eq("is_current", true)
+    .order("first_name", { ascending: true });
   if (error) {
     console.error("Error fetching staff:", error.message);
   }
