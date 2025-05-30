@@ -51,7 +51,9 @@ export default function DashQueueTable({
             console.log("Entry updated:", payload.new);
             setQueueEntries((prevQueueEntries) =>
               prevQueueEntries?.map((entry) => {
-                return entry.id === payload.new.id ? payload.new as QueueEntry : entry;
+                return entry.id === payload.new.id
+                  ? (payload.new as QueueEntry)
+                  : entry;
               })
             );
           }
@@ -62,16 +64,22 @@ export default function DashQueueTable({
       subscription.unsubscribe();
     };
   }, []);
-
-  const queueElements = queueEntries?.map((queueElement) => {
-    return (
-      <DashQueueTableRow
-        queueEntry={queueElement}
-        staffData={staffData}
-        key={queueElement.id}
-      />
-    );
-  });
+  const statusOrder = ["in progress", "waiting", "finished", "cancelled"];
+  const queueElements = queueEntries
+    ?.sort((a, b) => {
+      const aIndex = statusOrder.indexOf(a.status);
+      const bIndex = statusOrder.indexOf(b.status);
+      return aIndex - bIndex;
+    })
+    ?.map((queueElement) => {
+      return (
+        <DashQueueTableRow
+          queueEntry={queueElement}
+          staffData={staffData}
+          key={queueElement.id}
+        />
+      );
+    });
 
   return (
     <Table>
