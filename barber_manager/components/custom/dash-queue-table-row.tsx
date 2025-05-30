@@ -14,6 +14,13 @@ export default function DashQueueTableRow({
   queueEntry: QueueEntry;
   staffData: Barber[] | null;
 }) {
+  /** Filter staffData for Select element to include only onsite staff and the current barber 
+  (to preserve the name on disabled selects for finished entries) */
+  const selectableStaff = staffData?.filter(
+    (staff) => staff.status === "onsite" || staff.id === queueEntry.barber_id
+  );
+
+  // State to track selected barber
   const [selectedBarberId, setSelectedBarberId] = useState<number | null>(
     queueEntry.barber_id
   );
@@ -73,8 +80,8 @@ export default function DashQueueTableRow({
           disabled={queueEntry.status !== "waiting"}
         >
           <option value="">-- No barber assigned --</option>
-          {staffData &&
-            staffData.map((barber) => (
+          {selectableStaff &&
+            selectableStaff.map((barber) => (
               <option key={barber.id} value={barber.id as number}>
                 {barber.first_name}
               </option>

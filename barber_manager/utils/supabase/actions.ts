@@ -144,11 +144,10 @@ export async function toggleStaffStatus(
 ): Promise<any> {
   try {
     const supabase = await createClient();
-    const statusToUpdate =
-      status === "onsite" ? "offsite" : "onsite";
+    const statusToUpdate = status === "onsite" ? "offsite" : "onsite";
     const { data, error } = await supabase
       .from("staff")
-      .update({ status: statusToUpdate,})
+      .update({ status: statusToUpdate })
       .eq("id", staffId)
       .select();
     if (error) {
@@ -156,6 +155,7 @@ export async function toggleStaffStatus(
       return { success: false, message: "Failed to update staff status." };
     }
     revalidatePath("/admin");
+    revalidatePath("/admin/dashboard");
     return {
       success: true,
       message: "Staff status updated successfully: " + statusToUpdate,
