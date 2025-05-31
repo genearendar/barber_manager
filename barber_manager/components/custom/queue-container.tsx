@@ -50,8 +50,8 @@ export default function QueueContainer({
     );
   });
   return (
-    <div className="flex flex-col gap-2 max-w-xl">
-      <div className="flex justify-between mb-12">
+    <div className="w-full flex flex-col gap-2 items-center">
+      <div className="flex justify-between mb-12 w-full max-w-xl">
         <div className="flex items-center">
           <div className="bg-gradient-to-r from-red-500 to-red-600 p-3 rounded-xl mr-4">
             <Scissors className="h-8 w-8 text-white" />
@@ -64,7 +64,7 @@ export default function QueueContainer({
 
         <QueueTimer />
       </div>
-      {queueElements}
+      <div className="w-full grid md:grid-cols-2 gap-4">{queueElements}</div>
     </div>
   );
 }
