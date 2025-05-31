@@ -156,6 +156,7 @@ export async function toggleStaffStatus(
     }
     revalidatePath("/admin");
     revalidatePath("/admin/dashboard");
+    revalidatePath("/queue");
     return {
       success: true,
       message: "Staff status updated successfully: " + statusToUpdate,

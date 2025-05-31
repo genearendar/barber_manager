@@ -1,61 +1,19 @@
 "use client";
 import { QueueEntry, Barber } from "@/types/db";
-import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { cn, calculateWaitTime } from "@/utils/utils";
+import useQueueRealtime from "@/hooks/use-queue-realtime";
 export default function QueueContainer({
-  queueData, staffData
+  queueData,
+  staffData,
 }: {
   queueData: QueueEntry[] | null;
-  staffData: Barber[] | null
+  staffData: Barber[] | null;
 }) {
-  // Queue entries state
-  const [queueEntries, setQueueEntries] = useState<
-    QueueEntry[] | null | undefined
-  >(queueData);
-  //Subscribe to realtime updates
-  useEffect(() => {
-    const supabase = createClient();
-    const subscription = supabase
-      .channel("supabase_realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "queue",
-        },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            console.log("New entry:", payload.new);
-            setQueueEntries((prevQueueEntries) => [
-              ...(prevQueueEntries ?? []),
-              payload.new as QueueEntry,
-            ]);
-          } else if (payload.eventType === "DELETE") {
-            console.log("Entry deleted:", payload.old);
-            setQueueEntries((prevQueueEntries) =>
-              prevQueueEntries?.filter((entry) => entry.id !== payload.old.id)
-            );
-          } else if (payload.eventType === "UPDATE") {
-            console.log("Entry updated:", payload.new);
-            setQueueEntries((prevQueueEntries) =>
-              prevQueueEntries?.map((entry) => {
-                return entry.id === payload.new.id
-                  ? (payload.new as QueueEntry)
-                  : entry;
-              })
-            );
-          }
-        }
-      )
-      .subscribe();
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const queueElements = queueEntries?.map((entry, index) => {
+  const { realtimeQueue, realtimeStaff } = useQueueRealtime(
+    queueData,
+    staffData
+  );
+  const queueElements = realtimeQueue?.map((entry, index) => {
     return (
       <div
         key={entry.id}
@@ -66,7 +24,9 @@ export default function QueueContainer({
       >
         <p className="text-2xl">{entry.name}</p>
         <p>{entry.status}</p>
-        <p className="text-md text-right">Wait time: {calculateWaitTime(staffData?.length, index)}</p>
+        <p className="text-md text-right">
+          Wait time: {calculateWaitTime(realtimeStaff, index)}
+        </p>
       </div>
     );
   });

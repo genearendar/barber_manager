@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Barber, QueueEntry } from "@/types/db";
-
+import { Barber } from "@/types/db";
 /**
  * Redirects to a specified path with an encoded message as a query parameter.
  * @param {('error' | 'success')} type - The type of message, either 'error' or 'success'.
@@ -24,13 +23,15 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 // Calculate wait time for a queue entry
-export async function calculateWaitTime(
-  avaliableStaff: number | undefined,
+export function calculateWaitTime(
+  staffData: Barber[] | null | undefined,
   positionInQueue: number
 ) {
   const AVG_WAIT_TIME = 15; // Average wait time in minutes
+  const availableStaff =
+    staffData && staffData.filter((staff) => staff.status === "onsite").length;
   const waitTime =
-    avaliableStaff &&
-    AVG_WAIT_TIME * Math.ceil((positionInQueue + 1) / avaliableStaff);
-  return avaliableStaff ? `${waitTime} minutes` : "no staff available";
+    availableStaff &&
+    AVG_WAIT_TIME * Math.ceil((positionInQueue + 1) / availableStaff);
+  return availableStaff ? `${waitTime} minutes` : "no staff available";
 }
