@@ -57,3 +57,17 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
   return staff;
 }
 
+// Fetch available staff
+export async function getAvailableStaff(): Promise<Barber[] | null> {
+  const supabase = await createClient();
+  const { data: staff, error } = await supabase
+    .from("staff")
+    .select("id, first_name, last_name, status")
+    .eq("status", "onsite")
+    .order("first_name", { ascending: true });
+  if (error) {
+    console.error("Error fetching staff:", error.message);
+  }
+  return staff;
+}
+

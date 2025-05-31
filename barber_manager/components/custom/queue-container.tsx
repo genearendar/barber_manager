@@ -1,12 +1,13 @@
 "use client";
-import { QueueEntry } from "@/types/db";
+import { QueueEntry, Barber } from "@/types/db";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { cn } from "@/utils/utils";
+import { cn, calculateWaitTime } from "@/utils/utils";
 export default function QueueContainer({
-  queueData,
+  queueData, staffData
 }: {
   queueData: QueueEntry[] | null;
+  staffData: Barber[] | null
 }) {
   // Queue entries state
   const [queueEntries, setQueueEntries] = useState<
@@ -54,7 +55,7 @@ export default function QueueContainer({
     };
   }, []);
 
-  const queueElements = queueEntries?.map((entry) => {
+  const queueElements = queueEntries?.map((entry, index) => {
     return (
       <div
         key={entry.id}
@@ -65,7 +66,7 @@ export default function QueueContainer({
       >
         <p className="text-2xl">{entry.name}</p>
         <p>{entry.status}</p>
-        <p className="text-md text-right">Wait time: 15 minutes</p>
+        <p className="text-md text-right">Wait time: {calculateWaitTime(staffData, index)}</p>
       </div>
     );
   });

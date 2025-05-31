@@ -25,11 +25,13 @@ export function cn(...inputs: ClassValue[]) {
 
 // Calculate wait time for a queue entry
 export async function calculateWaitTime(
-  activeQueue: QueueEntry[],
-  avaliableStaff: Barber[]
+  avaliableStaff: Barber[] | null,
+  positionInQueue: number
 ) {
+  const numberOfStaff = avaliableStaff?.length;
   const AVG_WAIT_TIME = 15; // Average wait time in minutes
   const waitTime =
-    AVG_WAIT_TIME * Math.ceil(activeQueue.length / avaliableStaff.length);
-  return waitTime;
+    numberOfStaff &&
+    AVG_WAIT_TIME * Math.ceil((positionInQueue + 1) / numberOfStaff);
+  return numberOfStaff ? `${waitTime} minutes` : "no staff available";
 }
