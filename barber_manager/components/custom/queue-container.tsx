@@ -2,15 +2,17 @@
 import { QueueEntry } from "@/types/db";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 export default function QueueContainer({
   queueData,
 }: {
   queueData: QueueEntry[] | null;
 }) {
+  // Queue entries state
   const [queueEntries, setQueueEntries] = useState<
     QueueEntry[] | null | undefined
   >(queueData);
+  //Subscribe to realtime updates
   useEffect(() => {
     const supabase = createClient();
     const subscription = supabase
@@ -51,7 +53,7 @@ export default function QueueContainer({
       subscription.unsubscribe();
     };
   }, []);
-
+  function calculateWaitTime() {}
   const queueElements = queueEntries?.map((entry) => {
     // Extra check to filter out entries that are not waiting or in progress
     if (entry.status !== "waiting") return null;

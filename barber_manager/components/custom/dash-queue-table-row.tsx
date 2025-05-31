@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { QueueEntry, Barber } from "@/types/db";
 import { useState, ChangeEvent } from "react";
