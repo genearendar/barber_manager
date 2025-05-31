@@ -33,5 +33,5 @@ export function calculateWaitTime(
   const waitTime =
     availableStaff &&
     AVG_WAIT_TIME * Math.ceil((positionInQueue + 1) / availableStaff);
-  return availableStaff ? `${waitTime} minutes` : "no staff available";
+  return availableStaff ? `${waitTime} min` : "no staff available";
 }
