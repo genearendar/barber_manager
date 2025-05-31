@@ -44,10 +44,12 @@ export default function RootLayout({
                   <div className="flex gap-5 items-center font-semibold">
                     <Link href={"/"}>Barbershop Manager</Link>
                   </div>
-                  <Link href="/queue">Queue</Link>
-                  <Link href="/admin">Staff</Link>
-                  <Link href="/admin/dashboard">Dashboard</Link>
-                  <Link href="/admin/queue-kiosk">Kiosk</Link>
+                  <div className="nav-items hidden md:flex flex gap-8 lg:gap-16">
+                    <Link href="/queue">Queue</Link>
+                    <Link href="/admin">Staff</Link>
+                    <Link href="/admin/dashboard">Dashboard</Link>
+                    <Link href="/admin/queue-kiosk">Kiosk</Link>
+                  </div>
 
                   {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                 </div>
