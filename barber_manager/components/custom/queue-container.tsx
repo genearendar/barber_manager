@@ -13,7 +13,11 @@ export default function QueueContainer({
     queueData,
     staffData
   );
-  const queueElements = realtimeQueue?.map((entry, index) => {
+  // Implement an extra filter to only retain waiting entries
+  const filteredQueue = realtimeQueue?.filter(
+    (entry) => entry.status === "waiting"
+  );
+  const queueElements = filteredQueue?.map((entry, index) => {
     return (
       <div
         key={entry.id}

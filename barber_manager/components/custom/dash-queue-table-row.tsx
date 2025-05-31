@@ -12,7 +12,7 @@ export default function DashQueueTableRow({
   staffData,
 }: {
   queueEntry: QueueEntry;
-  staffData: Barber[] | null;
+  staffData: Barber[] | null | undefined;
 }) {
   /** Filter staffData for Select element to include only onsite staff and the current barber 
   (to preserve the name on disabled selects for finished entries) */
