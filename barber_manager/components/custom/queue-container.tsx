@@ -3,6 +3,7 @@ import { QueueEntry, Barber } from "@/types/db";
 import { cn, calculateWaitTime } from "@/utils/utils";
 import useQueueRealtime from "@/hooks/use-queue-realtime";
 import { Clock, Scissors } from "lucide-react";
+import QueueTimer from "./queue-timer";
 export default function QueueContainer({
   queueData,
   staffData,
@@ -33,10 +34,10 @@ export default function QueueContainer({
 
         <h3 className="text-xl font-bold text-gray-900">{entry.name}</h3>
         {/* <p>{entry.status}</p> */}
-        <div className="flex justify-between">
-          <div className="flex">
-            <Clock />
-            <p className="text-md ml-2">Est. wait:</p>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Clock className="h-5 w-5 text-gray-800" />
+            <p className="text-md ml-2">Est. wait</p>
           </div>
           <div className="text-xl font-bold text-gray-900">
             {calculateWaitTime(realtimeStaff, index)}
@@ -45,5 +46,22 @@ export default function QueueContainer({
       </div>
     );
   });
-  return <div className="flex flex-col gap-2 max-w-2xl">{queueElements}</div>;
+  return (
+    <div className="flex flex-col gap-2 max-w-2xl">
+      <div className="flex justify-between mb-12">
+        <div className="flex items-center">
+          <div className="bg-gradient-to-r from-red-500 to-red-600 p-3 rounded-xl mr-4">
+            <Scissors className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Live Queue</h1>
+            <p className="text-gray-600">Updated in real-time</p>
+          </div>
+        </div>
+
+        <QueueTimer />
+      </div>
+      {queueElements}
+    </div>
+  );
 }
