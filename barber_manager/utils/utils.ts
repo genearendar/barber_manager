@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-
+import { Barber, QueueEntry } from "@/types/db";
 
 /**
  * Redirects to a specified path with an encoded message as a query parameter.
@@ -13,7 +13,7 @@ import { twMerge } from "tailwind-merge";
 export function encodedRedirect(
   type: "error" | "success",
   path: string,
-  message: string,
+  message: string
 ) {
   return redirect(`${path}?${type}=${encodeURIComponent(message)}`);
 }
@@ -21,4 +21,15 @@ export function encodedRedirect(
 // Merge classnames
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+// Calculate wait time for a queue entry
+export async function calculateWaitTime(
+  activeQueue: QueueEntry[],
+  avaliableStaff: Barber[]
+) {
+  const AVG_WAIT_TIME = 15; // Average wait time in minutes
+  const waitTime =
+    AVG_WAIT_TIME * Math.ceil(activeQueue.length / avaliableStaff.length);
+  return waitTime;
 }

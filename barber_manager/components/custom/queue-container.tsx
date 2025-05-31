@@ -53,10 +53,8 @@ export default function QueueContainer({
       subscription.unsubscribe();
     };
   }, []);
-  function calculateWaitTime() {}
+
   const queueElements = queueEntries?.map((entry) => {
-    // Extra check to filter out entries that are not waiting or in progress
-    if (entry.status !== "waiting") return null;
     return (
       <div
         key={entry.id}
