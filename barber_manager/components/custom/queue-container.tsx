@@ -66,7 +66,7 @@ export default function QueueContainer({
       >
         <p className="text-2xl">{entry.name}</p>
         <p>{entry.status}</p>
-        <p className="text-md text-right">Wait time: {calculateWaitTime(staffData, index)}</p>
+        <p className="text-md text-right">Wait time: {calculateWaitTime(staffData?.length, index)}</p>
       </div>
     );
   });
