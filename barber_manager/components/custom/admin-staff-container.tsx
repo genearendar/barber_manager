@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { toggleStaffStatus } from "@/utils/supabase/actions";
 import { cn } from "@/utils/utils";
 export default function AdminStaffContainer({ staff }: { staff: Barber }) {
+
   async function handleClick() {
     await toggleStaffStatus(staff.id, staff.status);
   }

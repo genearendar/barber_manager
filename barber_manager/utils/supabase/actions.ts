@@ -2,6 +2,7 @@
 import { AnyARecord } from "node:dns";
 import { createClient } from "./server";
 import { revalidatePath } from "next/cache";
+import { getShopStatus } from "./queries";
 
 // Add a new queue entry
 export async function addToQueue(formData: FormData): Promise<any> {
@@ -161,6 +162,32 @@ export async function toggleStaffStatus(
       success: true,
       message: "Staff status updated successfully: " + statusToUpdate,
     };
+  } catch (error) {
+    console.error("Error updating status:", error);
+    return { success: false, message: "Failed to update status." };
+  }
+}
+
+export async function toggleShopStatus(): Promise<any> {
+  try {
+    const supabase = await createClient();
+    const currentIsOpen = await getShopStatus();
+    console.log("Current status:", currentIsOpen);
+    const newStatus = currentIsOpen.value === "yes" ? "no" : "yes";
+    console.log("New status:", newStatus);
+    const { data, error } = await supabase
+      .from("business_settings")
+      .update({ value: newStatus })
+      .eq("key", "is_open")
+      .select();
+    if (error) {
+      console.error("Error updating shop status:", error);
+      return { success: false, message: "Failed to update shop status." };
+    }
+    revalidatePath("/admin");
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/queue");
+    return { success: true, message: "Shop status updated successfully." };
   } catch (error) {
     console.error("Error updating status:", error);
     return { success: false, message: "Failed to update status." };
