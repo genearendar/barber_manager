@@ -12,7 +12,7 @@ export default function ShopStatusProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [shopStatus, setShopStatus] = useState<string | null>(null);
+  const [shopIsOpen, setShopIsOpen] = useState<string | null>(null);
   async function getShopStatus(): Promise<string | any> {
     const supabase = await createClient();
     const { data: status, error } = await supabase
@@ -25,13 +25,14 @@ export default function ShopStatusProvider({
     }
     return status?.value as string | null;
   }
+  // Subscribe to shop status updates realtime
   useEffect(() => {
     const fetchStatus = async () => {
       try {
         const isOpen: string | null = await getShopStatus();
-        setShopStatus(isOpen);
+        setShopIsOpen(isOpen);
       } catch (error) {
-        setShopStatus(null);
+        setShopIsOpen(null);
         console.error("Error fetching shop status:", error);
       }
     };
@@ -52,7 +53,7 @@ export default function ShopStatusProvider({
           (payload) => {
             if (payload.new) {
               const isOpen = payload.new.value;
-              setShopStatus(isOpen);
+              setShopIsOpen(isOpen);
             }
           }
         )
@@ -69,7 +70,7 @@ export default function ShopStatusProvider({
   }, []);
 
   return (
-    <ShopStatusContext.Provider value={shopStatus}>
+    <ShopStatusContext.Provider value={shopIsOpen}>
       {children}
     </ShopStatusContext.Provider>
   );

@@ -2,10 +2,10 @@ import { useContext } from "react";
 import { ShopStatusContext } from "@/contexts/shop-status-context";
 
 export function useShopStatus() {
-  const context = useContext(ShopStatusContext);
+  const shopIsOpen = useContext(ShopStatusContext);
 
-  if (context === undefined) {
+  if (shopIsOpen === undefined) {
     throw new Error("useShopStatus must be used within a ShopStatusProvider");
   }
-  return context;
+  return shopIsOpen;
 }

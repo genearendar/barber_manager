@@ -1,6 +1,7 @@
 "use client";
 import { useShopStatus } from "@/hooks/use-shop-status";
 
+// Client component wrapper to use shop status context on the page
 export default function KioskContainer({
   children,
 }: {
