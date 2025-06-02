@@ -23,7 +23,7 @@ export default function ShopStatusProvider({
     if (error) {
       console.error("Error fetching shop status:", error.message);
     }
-    return status as string | null;
+    return status?.value as string | null;
   }
   useEffect(() => {
     const fetchStatus = async () => {

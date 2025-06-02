@@ -74,7 +74,7 @@ export async function getAvailableStaff(): Promise<Barber[] | null> {
 // Get shop status
 export async function getShopStatus(): Promise<string | any> {
   const supabase = await createClient();
-  const { data: status, error } = await supabase
+  const { data: isOpen, error } = await supabase
     .from("business_settings")
     .select("value")
     .eq("key", "is_open")
@@ -82,5 +82,5 @@ export async function getShopStatus(): Promise<string | any> {
   if (error) {
     console.error("Error fetching shop status:", error.message);
   }
-  return status as string | null;
+  return isOpen?.value as string | null;
 }

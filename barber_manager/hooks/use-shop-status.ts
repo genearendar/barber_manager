@@ -7,6 +7,5 @@ export function useShopStatus() {
   if (context === undefined) {
     throw new Error("useShopStatus must be used within a ShopStatusProvider");
   }
-
   return context;
 }

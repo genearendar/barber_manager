@@ -172,9 +172,9 @@ export async function toggleShopStatus(): Promise<any> {
   try {
     const supabase = await createClient();
     const currentIsOpen = await getShopStatus();
-    console.log("Current status:", currentIsOpen);
-    const newStatus = currentIsOpen.value === "yes" ? "no" : "yes";
-    console.log("New status:", newStatus);
+    console.log("Current isOpen:", currentIsOpen);
+    const newStatus = currentIsOpen === "yes" ? "no" : "yes";
+    console.log("New isOpen:", newStatus);
     const { data, error } = await supabase
       .from("business_settings")
       .update({ value: newStatus })
