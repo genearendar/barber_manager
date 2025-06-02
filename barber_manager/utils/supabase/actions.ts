@@ -141,14 +141,13 @@ export async function cancelQueueEntry(queueEntryId: number): Promise<any> {
 // Toggle staff status
 export async function toggleStaffStatus(
   staffId: number,
-  status: string
+  newStatus: string
 ): Promise<any> {
   try {
     const supabase = await createClient();
-    const statusToUpdate = status === "onsite" ? "offsite" : "onsite";
     const { data, error } = await supabase
       .from("staff")
-      .update({ status: statusToUpdate })
+      .update({ status: newStatus })
       .eq("id", staffId)
       .select();
     if (error) {
@@ -160,7 +159,7 @@ export async function toggleStaffStatus(
     revalidatePath("/queue");
     return {
       success: true,
-      message: "Staff status updated successfully: " + statusToUpdate,
+      message: "Staff status updated successfully: " + newStatus,
     };
   } catch (error) {
     console.error("Error updating status:", error);
@@ -168,6 +167,7 @@ export async function toggleStaffStatus(
   }
 }
 
+// Toggle shop status to open or closed
 export async function toggleShopStatus(): Promise<any> {
   try {
     const supabase = await createClient();

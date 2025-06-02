@@ -4,8 +4,9 @@ import { Button } from "../ui/button";
 import { toggleStaffStatus } from "@/utils/supabase/actions";
 import { cn } from "@/utils/utils";
 export default function AdminStaffEtry({ staff }: { staff: Barber }) {
-  async function handleClick() {
-    await toggleStaffStatus(staff.id, staff.status);
+  async function handleClick(newStatus: string) {
+    const result = await toggleStaffStatus(staff.id, newStatus);
+    console.log(result);
   }
   return (
     <div className="flex items-center gap-10">
@@ -24,13 +25,30 @@ export default function AdminStaffEtry({ staff }: { staff: Barber }) {
       >
         {staff.status}
       </p>
-      <Button
-        variant="link"
-        className="w-35 justify-self-start text-blue-600"
-        onClick={handleClick}
-      >
-        {staff.status === "onsite" ? "Check out" : "Check in"}
-      </Button>
+      {staff.status !== "break" && (
+        <Button
+          variant="link"
+          className="w-35 justify-self-start text-blue-600"
+          onClick={() =>
+            handleClick(staff.status !== "onsite" ? "onsite" : "offsite")
+          }
+          aria-label="Check in and out"
+        >
+          {staff.status === "onsite" ? "Check out" : "Check in"}
+        </Button>
+      )}
+      {staff.status !== "offsite" && (
+        <Button
+          variant="link"
+          className="w-35 justify-self-start text-blue-600"
+          onClick={() =>
+            handleClick(staff.status === "onsite" ? "break" : "onsite")
+          }
+          aria-label="Start and finish break"
+        >
+          {staff.status === "onsite" ? "Take a break" : "Finish break"}
+        </Button>
+      )}
     </div>
   );
 }
