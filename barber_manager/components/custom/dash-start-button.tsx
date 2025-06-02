@@ -65,7 +65,9 @@ export default function DashStartButton({
         >
           {buttonText}
         </Button>
-        {!isSuccess && <p className="text-xs text-red-500">{message}</p>}
+        {isSuccess === false && (
+          <p className="text-xs text-red-500">{message}</p>
+        )}
       </>
     )
   );
