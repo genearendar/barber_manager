@@ -3,8 +3,7 @@ import { Barber } from "@/types/db";
 import { Button } from "../ui/button";
 import { toggleStaffStatus } from "@/utils/supabase/actions";
 import { cn } from "@/utils/utils";
-export default function AdminStaffContainer({ staff }: { staff: Barber }) {
-
+export default function AdminStaffEtry({ staff }: { staff: Barber }) {
   async function handleClick() {
     await toggleStaffStatus(staff.id, staff.status);
   }
@@ -16,7 +15,11 @@ export default function AdminStaffContainer({ staff }: { staff: Barber }) {
       <p
         className={cn(
           "w-20 text-center px-2 rounded-md",
-          staff.status === "onsite" ? "bg-green-500" : "bg-red-500"
+          staff.status === "onsite"
+            ? "bg-green-500"
+            : staff.status === "break"
+              ? "bg-yellow-500"
+              : "bg-red-500"
         )}
       >
         {staff.status}
