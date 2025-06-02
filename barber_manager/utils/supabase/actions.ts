@@ -90,10 +90,29 @@ export async function updateServiceStatus(
   newStatus: string
 ): Promise<any> {
   const supabase = await createClient();
+
   try {
+    const updates: {
+      status: string;
+      started_at?: Date | null;
+      finished_at?: Date | null;
+    } = {
+      status: newStatus,
+    };
+
+    // Conditionally add timestamp updates based on the new status
+    if (newStatus === "in progress") {
+      updates.started_at = new Date(); // Set started_at to now
+    } else if (newStatus === "finished") {
+      updates.finished_at = new Date(); // Set finished_at to now
+    } else if (newStatus === "cancelled" || newStatus === "waiting") {
+      // For cancelled and waiting, set both timestamps to null
+      updates.started_at = null;
+      updates.finished_at = null;
+    }
     const { data, error } = await supabase
       .from("queue")
-      .update({ status: newStatus })
+      .update(updates)
       .eq("id", queueEntryId)
       .select();
     if (error) {

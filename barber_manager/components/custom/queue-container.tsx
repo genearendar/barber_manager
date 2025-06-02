@@ -15,7 +15,7 @@ export default function QueueContainer({
     queueData,
     staffData
   );
-  // Implement an extra filter to only retain waiting entries
+  // Implement filter to only retain waiting entries
   const filteredQueue = realtimeQueue?.filter(
     (entry) => entry.status === "waiting"
   );
