@@ -3,11 +3,14 @@ import { Barber } from "@/types/db";
 import { Button } from "../ui/button";
 import { toggleStaffStatus } from "@/utils/supabase/actions";
 import { cn } from "@/utils/utils";
+import UseAsyncAction from "@/hooks/use-async-action";
 export default function AdminStaffEtry({ staff }: { staff: Barber }) {
-  async function handleClick(newStatus: string) {
-    const result = await toggleStaffStatus(staff.id, newStatus);
-    console.log(result);
-  }
+  const {
+    execute: toggleStatus,
+    isLoading,
+    isSuccess,
+    message,
+  } = UseAsyncAction(toggleStaffStatus);
   return (
     <div className="flex items-center gap-10">
       <p className="max-w-1/4 w-60 font-semibold">
@@ -25,30 +28,52 @@ export default function AdminStaffEtry({ staff }: { staff: Barber }) {
       >
         {staff.status}
       </p>
-      {staff.status !== "break" && (
-        <Button
-          variant="link"
-          className="w-35 justify-self-start text-blue-600"
-          onClick={() =>
-            handleClick(staff.status !== "onsite" ? "onsite" : "offsite")
-          }
-          aria-label="Check in and out"
-        >
-          {staff.status === "onsite" ? "Check out" : "Check in"}
-        </Button>
-      )}
-      {staff.status !== "offsite" && (
-        <Button
-          variant="link"
-          className="w-35 justify-self-start text-blue-600"
-          onClick={() =>
-            handleClick(staff.status === "onsite" ? "break" : "onsite")
-          }
-          aria-label="Start and finish break"
-        >
-          {staff.status === "onsite" ? "Take a break" : "Finish break"}
-        </Button>
-      )}
+      <div>
+        <div className="buttons">
+          {staff.status !== "break" && (
+            <Button
+              variant="link"
+              className="w-35 justify-self-start text-blue-600"
+              disabled={isLoading}
+              onClick={() =>
+                toggleStatus(
+                  staff.id,
+                  staff.status !== "onsite" ? "onsite" : "offsite"
+                )
+              }
+              aria-label="Check in and out"
+            >
+              {staff.status === "onsite" ? "Check out" : "Check in"}
+            </Button>
+          )}
+          {staff.status !== "offsite" && (
+            <Button
+              variant="link"
+              className="w-35 justify-self-start text-blue-600"
+              disabled={isLoading}
+              onClick={() =>
+                toggleStatus(
+                  staff.id,
+                  staff.status === "onsite" ? "break" : "onsite"
+                )
+              }
+              aria-label="Start and finish break"
+            >
+              {staff.status === "onsite" ? "Take a break" : "Finish break"}
+            </Button>
+          )}
+        </div>
+        {message && (
+          <p
+            className={cn(
+              "text-xs text-green-500 px-4",
+              !isSuccess && "text-red-500"
+            )}
+          >
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
