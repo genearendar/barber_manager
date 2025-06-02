@@ -9,9 +9,10 @@ export type QueueEntry = {
   // client_id: string | null;
 };
 
+export type StaffStatus = "onsite" | "offsite" | "break";
 export type Barber = {
   id: number;
   first_name: string;
   last_name: string;
-  status: string;
+  status: StaffStatus;
 };

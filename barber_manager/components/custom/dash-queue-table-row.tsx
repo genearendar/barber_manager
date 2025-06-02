@@ -17,7 +17,7 @@ export default function DashQueueTableRow({
   /** Filter staffData for Select element to include only onsite staff and the current barber 
   (to preserve the name on disabled selects for finished entries) */
   const selectableStaff = staffData?.filter(
-    (staff) => staff.status === "onsite" || staff.id === queueEntry.barber_id
+    (staff) => staff.status !== "offsite" || staff.id === queueEntry.barber_id
   );
 
   // State to track selected barber
