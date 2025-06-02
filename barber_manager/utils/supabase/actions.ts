@@ -84,45 +84,16 @@ export async function assignBarberToQueueEntry(
   }
 }
 
-// Start and finish service
-export async function toggleServiceStatus(
+// Update service status
+export async function updateServiceStatus(
   queueEntryId: number,
-  status: string
+  newStatus: string
 ): Promise<any> {
-  try {
-    const supabase = await createClient();
-    const statusToUpdate =
-      status === "in progress" ? "finished" : "in progress";
-    const timeStampToUpdate =
-      statusToUpdate === "in progress" ? "started_at" : "finished_at";
-    const { data, error } = await supabase
-      .from("queue")
-      .update({ status: statusToUpdate, [timeStampToUpdate]: new Date() })
-      .eq("id", queueEntryId)
-      .select();
-    if (error) {
-      console.error("Error updating status:", error);
-      return { success: false, message: "Failed to update status." };
-    }
-    revalidatePath("/admin/dashboard");
-    revalidatePath("/queue");
-    return {
-      success: true,
-      message: "Status updated successfully: " + statusToUpdate,
-    };
-  } catch (error) {
-    console.error("Error starting service:", error);
-    return { success: false, message: "Failed to update status." };
-  }
-}
-
-// Cancel query item
-export async function cancelQueueEntry(queueEntryId: number): Promise<any> {
   const supabase = await createClient();
   try {
     const { data, error } = await supabase
       .from("queue")
-      .update({ status: "cancelled" })
+      .update({ status: newStatus })
       .eq("id", queueEntryId)
       .select();
     if (error) {
@@ -131,7 +102,7 @@ export async function cancelQueueEntry(queueEntryId: number): Promise<any> {
     }
     revalidatePath("/admin/dashboard");
     revalidatePath("/queue");
-    return { success: true, message: "Entry cancelled successfully." };
+    return { success: true, message: "Service status updated successfully." };
   } catch (error) {
     console.error("Error starting service:", error);
     return { success: false, message: "Failed to update status." };

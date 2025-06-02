@@ -6,6 +6,7 @@ import { useState, ChangeEvent } from "react";
 import { assignBarberToQueueEntry } from "@/utils/supabase/actions";
 import DashStartButton from "./dash-start-button";
 import DashCancelButton from "./dash-cancel-button";
+import DashReopenButton from "./dash-reopen-button";
 
 export default function DashQueueTableRow({
   queueEntry,
@@ -99,6 +100,10 @@ export default function DashQueueTableRow({
             busyBarbers={busyBarbers}
           />
           <DashCancelButton
+            queueEntryId={queueEntry.id}
+            status={queueEntry.status}
+          />
+          <DashReopenButton
             queueEntryId={queueEntry.id}
             status={queueEntry.status}
           />

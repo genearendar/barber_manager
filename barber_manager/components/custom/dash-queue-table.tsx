@@ -24,18 +24,34 @@ export default function DashQueueTable({
     staffData
   );
   //Get busy barbers to pass this on to the start button
-  const busyBarbers = realtimeQueue?.filter(
-    (entry) => entry.status === "in progress"
-  ).map((entry) => entry.barber_id);
+  const busyBarbers = realtimeQueue
+    ?.filter((entry) => entry.status === "in progress")
+    .map((entry) => entry.barber_id);
   // Sort queue entries by status and create elements
   const statusOrder = ["in progress", "waiting", "finished", "cancelled"];
   const queueElements = realtimeQueue
     ?.sort((a, b) => {
-      const aIndex = statusOrder.indexOf(a.status);
-      const bIndex = statusOrder.indexOf(b.status);
-      return aIndex - bIndex;
+      const aStatusIndex = statusOrder.indexOf(a.status);
+      const bStatusIndex = statusOrder.indexOf(b.status);
+
+      // Primary sort: by status category (e.g., all 'in progress' come before 'waiting')
+      if (aStatusIndex !== bStatusIndex) {
+        return aStatusIndex - bStatusIndex;
+      }
+
+      // Secondary sort: if statuses are the same, sort by created_at (oldest first)
+      // Assuming `created_at` is a string or Date object that can be directly compared
+      // If it's a string, ensure it's in a sortable format like ISO 8601 (e.g., "2023-10-26T10:00:00Z")
+      if (a.created_at < b.created_at) {
+        return -1; // 'a' comes before 'b'
+      }
+      if (a.created_at > b.created_at) {
+        return 1; // 'b' comes before 'a'
+      }
+
+      return 0; // Entries are identical in status and created_at order
     })
-    ?.map((queueElement) => {
+    .map((queueElement) => {
       return (
         <DashQueueTableRow
           queueEntry={queueElement}

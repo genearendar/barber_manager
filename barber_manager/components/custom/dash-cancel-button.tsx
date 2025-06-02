@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "../ui/button";
-import { cancelQueueEntry } from "@/utils/supabase/actions";
+import { updateServiceStatus } from "@/utils/supabase/actions";
 
 export default function DashCancelButton({
   queueEntryId,
@@ -10,7 +10,7 @@ export default function DashCancelButton({
   status: string;
 }) {
   async function handleClick() {
-    await cancelQueueEntry(queueEntryId);
+    await updateServiceStatus(queueEntryId, "cancelled");
   }
 
   let visible = true;
@@ -20,7 +20,11 @@ export default function DashCancelButton({
 
   return (
     visible && (
-      <Button className="bg-red-500 hover:bg-red-400" variant="default" onClick={handleClick}>
+      <Button
+        className="bg-red-500 hover:bg-red-400"
+        variant="default"
+        onClick={handleClick}
+      >
         Cancel
       </Button>
     )

@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "@/utils/utils";
 import { Button } from "../ui/button";
-import { toggleServiceStatus } from "@/utils/supabase/actions";
+import { updateServiceStatus } from "@/utils/supabase/actions";
 import UseAsyncAction from "@/hooks/use-async-action";
 
 export default function DashStartButton({
@@ -16,20 +16,16 @@ export default function DashStartButton({
   busyBarbers: (number | null)[] | undefined;
 }) {
   const {
-    execute: toggleService,
+    execute: updateService,
     isLoading,
     isSuccess,
     message,
-  } = UseAsyncAction(toggleServiceStatus);
+  } = UseAsyncAction(updateServiceStatus);
   const barberIsBusy = busyBarbers?.includes(selectedBarberId || 0) || false;
   // Text logic
   let buttonText = "Start";
   if (status === "in progress") {
     buttonText = "Finish";
-  } else if (status === "finished") {
-    buttonText = "Finished";
-  } else if (status === "cancelled") {
-    buttonText = "Cancelled";
   } else if (!selectedBarberId) {
     buttonText = " < Assign Barber";
   }
@@ -50,6 +46,7 @@ export default function DashStartButton({
   if (status === "finished" || status === "cancelled") {
     visible = false;
   }
+  let statusToUpdate = status === "in progress" ? "finished" : "in progress";
   return (
     visible && (
       <>
@@ -60,7 +57,7 @@ export default function DashStartButton({
             status === "finished" && "bg-blue-300"
           )}
           variant="default"
-          onClick={() => toggleService(queueEntryId, status)}
+          onClick={() => updateService(queueEntryId, statusToUpdate)}
           disabled={disabled || isLoading}
         >
           {buttonText}
