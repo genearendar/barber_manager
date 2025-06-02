@@ -19,11 +19,15 @@ export default function DashQueueTable({
   queueData: QueueEntry[] | null;
   staffData: Barber[] | null;
 }) {
- 
   const { realtimeQueue, realtimeStaff } = useQueueRealtime(
     queueData,
     staffData
   );
+  //Get busy barbers to pass this on to the start button
+  const busyBarbers = realtimeQueue?.filter(
+    (entry) => entry.status === "in progress"
+  ).map((entry) => entry.barber_id);
+  // Sort queue entries by status and create elements
   const statusOrder = ["in progress", "waiting", "finished", "cancelled"];
   const queueElements = realtimeQueue
     ?.sort((a, b) => {
@@ -37,6 +41,7 @@ export default function DashQueueTable({
           queueEntry={queueElement}
           staffData={realtimeStaff}
           key={queueElement.id}
+          busyBarbers={busyBarbers}
         />
       );
     });

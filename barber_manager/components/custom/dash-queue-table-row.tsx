@@ -10,9 +10,11 @@ import DashCancelButton from "./dash-cancel-button";
 export default function DashQueueTableRow({
   queueEntry,
   staffData,
+  busyBarbers,
 }: {
   queueEntry: QueueEntry;
   staffData: Barber[] | null | undefined;
+  busyBarbers: (number | null)[] | undefined;
 }) {
   /** Filter staffData for Select element to include only onsite staff and the current barber 
   (to preserve the name on disabled selects for finished entries) */
@@ -94,6 +96,7 @@ export default function DashQueueTableRow({
             queueEntryId={queueEntry.id}
             status={queueEntry.status}
             selectedBarberId={selectedBarberId}
+            busyBarbers={busyBarbers}
           />
           <DashCancelButton
             queueEntryId={queueEntry.id}
