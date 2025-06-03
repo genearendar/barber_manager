@@ -136,7 +136,7 @@ export async function toggleStaffStatus(
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from("staff")
+      .from("barbers")
       .update({ status: newStatus })
       .eq("id", staffId)
       .select();

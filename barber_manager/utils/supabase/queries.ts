@@ -25,7 +25,7 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
 export async function getAllCurrentStaff(): Promise<Barber[] | null> {
   const supabase = await createClient();
   const { data: staff, error } = await supabase
-    .from("staff")
+    .from("barbers")
     .select("id, first_name, last_name, status")
     .eq("is_current", true)
     .order("first_name", { ascending: true });
@@ -39,7 +39,7 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
 export async function getAvailableStaff(): Promise<Barber[] | null> {
   const supabase = await createClient();
   const { data: staff, error } = await supabase
-    .from("staff")
+    .from("barbers")
     .select("id, first_name, last_name, status")
     .eq("status", "onsite")
     .order("first_name", { ascending: true });
