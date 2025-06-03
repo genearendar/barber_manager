@@ -49,13 +49,13 @@ export default function useQueueRealtime(
 
     // Staff subscription...
     const staffSubscription = supabase
-      .channel("staff_realtime")
+      .channel("barbers_realtime")
       .on(
         "postgres_changes",
         {
           event: "UPDATE",
           schema: "public",
-          table: "staff",
+          table: "barbers",
         },
         (payload) => {
           console.log("Staff entry updated:", payload.new);
