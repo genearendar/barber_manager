@@ -10,17 +10,20 @@ export async function addToQueue(formData: FormData): Promise<any> {
 
   // Extract form data
   const name = formData.get("name")?.toString().trim();
+  const barberId = Number(formData.get("barberSelection"));
 
   // Validation
   if (!name || name.length < 2) {
     return {
-      error: "Name is required",
+      success: false,
+      message: "Name is required",
     };
   }
 
   if (name.length > 50) {
     return {
-      error: "Name must be less than 50 characters",
+      success: false,
+      message: "Name must be less than 50 characters",
     };
   }
 
@@ -31,6 +34,7 @@ export async function addToQueue(formData: FormData): Promise<any> {
       .insert({
         name: name,
         status: "waiting",
+        barber_id: barberId ? barberId : null,
       })
       .select()
       .single();
@@ -38,7 +42,8 @@ export async function addToQueue(formData: FormData): Promise<any> {
     if (error) {
       console.error("Database error:", error);
       return {
-        error: "Failed to add to queue. Please try again.",
+        success: false,
+        message: "Failed to add to queue. Please try again.",
       };
     }
 
@@ -48,12 +53,14 @@ export async function addToQueue(formData: FormData): Promise<any> {
 
     return {
       success: true,
+      message: "Added to queue successfully",
       data: data,
     };
   } catch (error) {
     console.error("Unexpected error:", error);
     return {
-      error: "An unexpected error occurred",
+      success: false,
+      message: "An unexpected error occurred",
     };
   }
 }
