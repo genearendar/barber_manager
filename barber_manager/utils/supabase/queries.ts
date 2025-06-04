@@ -23,6 +23,9 @@ export async function getCurrentTenantId(): Promise<string> {
 
 // Fetch all queue entries
 export async function getAllQueue(): Promise<QueueEntry[] | null> {
+  const hedersResult = await headers();
+  const tenantId = hedersResult.get("x-tenant-id");
+  console.log("Tenant ID:", tenantId);
   const supabase = await createClient(); // Initialize your server-side Supabase client
 
   // Select all necessary columns
