@@ -1,20 +1,22 @@
+import { updateSession, getCurrentTenantId } from "@/utils/supabase/middleware";
 import { type NextRequest } from "next/server";
-import { updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request);
+  // Always resolve tenant first (needed for all pages)
+  let response = await getCurrentTenantId(request);
+
+  // Update session
+  const sessionResponse = await updateSession(request);
+
+  // Copy tenant ID to session response
+  const tenantId = response.headers.get("x-tenant-id");
+  if (tenantId) {
+    sessionResponse.headers.set("x-tenant-id", tenantId);
+  }
+
+  return sessionResponse;
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  // Your existing config
 };
