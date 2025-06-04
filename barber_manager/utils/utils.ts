@@ -35,3 +35,4 @@ export function calculateWaitTime(
     AVG_WAIT_TIME * Math.ceil((positionInQueue + 1) / availableStaff);
   return availableStaff ? `${waitTime} min` : "no staff available";
 }
+

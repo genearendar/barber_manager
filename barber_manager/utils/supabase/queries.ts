@@ -1,21 +1,24 @@
+import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { QueueEntry } from "@/types/db";
 import { Barber } from "@/types/db";
 
-// Fetch the current tenant ID
-const SINGLE_TENANT_ID = process.env.NEXT_PUBLIC_SINGLE_TENANT_ID;
-export function getCurrentTenantId(): string {
-  // In a real multi-tenant app, this would get the tenant_id
-  // from headers, session, or request context set by middleware
-  // based on the URL slug, subdomain, or user session.
+// Get current tenant id
+export async function getCurrentTenantId(): Promise<string> {
+  const headerResult = await headers();
+  const slug = headerResult.get("x-tenant-slug");
+  if (!slug) throw new Error("Missing tenant slug");
 
-  // For now, we return the ID of your single tenant.
-  if (!SINGLE_TENANT_ID) {
-    console.error("Error. No tenant ID found.");
-    throw new Error("No tenant ID found.");
-  }
-  console.log("Tenant id:", SINGLE_TENANT_ID);
-  return SINGLE_TENANT_ID;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", slug)
+    .single();
+
+  if (error || !data) throw new Error("Invalid tenant");
+
+  return data.id as string;
 }
 
 // Fetch all queue entries

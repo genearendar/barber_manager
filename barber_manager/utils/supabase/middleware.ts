@@ -60,3 +60,9 @@ export const updateSession = async (request: NextRequest) => {
     });
   }
 };
+
+export function getTenantSlug(req: NextRequest) {
+  const res = NextResponse.next();
+  res.headers.set("x-tenant-slug", "rollestonhaircuts"); // fake middleware for now
+  return res;
+}
