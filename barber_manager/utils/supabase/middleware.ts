@@ -2,7 +2,6 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function getCurrentTenantId(req: NextRequest) {
-  console.log("--- Fetching current tenant id ---");
   const SLUG = "rollestonhaircuts"; // fake middleware for now. Get from subdomain later
 
   if (!SLUG) throw new Error("Missing tenant slug");

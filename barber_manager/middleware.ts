@@ -2,8 +2,6 @@ import { updateSession, getCurrentTenantId } from "@/utils/supabase/middleware";
 import { type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  console.log("--- MAIN MIDDLEWARE START ---");
-  console.log("Request URL:", request.url);
   // Always resolve tenant first (needed for all pages)
   let response = await getCurrentTenantId(request);
 
