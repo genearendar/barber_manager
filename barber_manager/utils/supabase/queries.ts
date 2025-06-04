@@ -30,7 +30,6 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
 
   if (error) {
     console.error("Error fetching active queue:", error.message);
-    // or return an empty array/null. Returning null is generally safer for UI.
     return null;
   }
   // Ensure 'queue' is an array of the correct type
