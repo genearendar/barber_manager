@@ -39,8 +39,8 @@ export type Tenant = {
   name: string;
   slug: string | null;
   is_active: boolean;
-  created_at: string; // timestamp
-  updated_at: string; // timestamp
+  created_at: string;
+  updated_at: string;
   settings: Record<string, any>; // jsonb
   owner_user_id: string; // uuid
 };
@@ -53,11 +53,11 @@ export type User = {
   phone: string | null;
   created_at: string;
   updated_at: string;
-  tenant_id: string | null; // Should this be nullable?
+  tenant_id: string;
 };
 
 export type QueueEntry = {
-  id: number;
+  id: string; // uuid
   created_at: string;
   name: string;
   status: QueueStatus;
@@ -67,16 +67,21 @@ export type QueueEntry = {
 };
 
 export type Barber = {
-  id: number;
+  id: string; // uuid
   first_name: string;
   last_name: string;
   status: BarberStatus;
 };
 
-// ===== TENANT-AWARE TYPES =====
-export type TenantAware<T> = T & {
-  tenant_id: string; // Non-nullable for tenant-aware operations
-};
-
-export type TenantAwareQueueEntry = TenantAware<QueueEntry>;
-export type TenantAwareBarber = TenantAware<Barber>;
+// ===== SERVER ACTION RETURN TYPE =====
+export type ServerActionReturn<TData = Record<string, unknown>> =
+  | {
+      success: true;
+      message?: string; // Optional success message
+      data?: TData;     // Optional data returned on success
+    }
+  | {
+      success: false;
+      message?: string; // Optional error message
+      data?: TData;     // Optional data (e.g., error details) returned on failure
+    };

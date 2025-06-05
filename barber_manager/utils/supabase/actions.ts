@@ -1,16 +1,18 @@
 "use server";
-import { AnyARecord } from "node:dns";
 import { createClient } from "./server";
 import { revalidatePath } from "next/cache";
 import { getShopStatus } from "./queries";
+import { Barber, QueueStatus, ServerActionReturn } from "@/types/db";
 
 // Add a new queue entry
-export async function addToQueue(formData: FormData): Promise<any> {
+export async function addToQueue(
+  formData: FormData
+): Promise<ServerActionReturn> {
   const supabase = await createClient();
 
   // Extract form data
   const name = formData.get("name")?.toString().trim();
-  const barberId = Number(formData.get("barberSelection"));
+  const barberId = formData.get("barberSelection");
 
   // Validation
   if (!name || name.length < 2) {
@@ -33,8 +35,8 @@ export async function addToQueue(formData: FormData): Promise<any> {
       .from("queue")
       .insert({
         name: name,
-        status: "waiting",
-        barber_id: barberId ? barberId : null,
+        status: "waiting" as QueueStatus,
+        barber_id: barberId ? (barberId as Barber["id"]) : null,
       })
       .select()
       .single();
@@ -69,7 +71,7 @@ export async function addToQueue(formData: FormData): Promise<any> {
 export async function assignBarberToQueueEntry(
   queueEntryId: number,
   barberId: number
-): Promise<any> {
+): Promise<ServerActionReturn> {
   // Assign barberId to null in case it's not provided
   try {
     const supabase = await createClient();
@@ -95,7 +97,7 @@ export async function assignBarberToQueueEntry(
 export async function updateServiceStatus(
   queueEntryId: number,
   newStatus: string
-): Promise<any> {
+): Promise<ServerActionReturn> {
   const supabase = await createClient();
 
   try {
@@ -139,7 +141,7 @@ export async function updateServiceStatus(
 export async function toggleStaffStatus(
   staffId: number,
   newStatus: string
-): Promise<any> {
+): Promise<ServerActionReturn> {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -165,7 +167,7 @@ export async function toggleStaffStatus(
 }
 
 // Toggle shop status to open or closed
-export async function toggleShopStatus(): Promise<any> {
+export async function toggleShopStatus(): Promise<ServerActionReturn> {
   try {
     const supabase = await createClient();
     const currentIsOpen = await getShopStatus();
