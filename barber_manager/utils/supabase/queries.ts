@@ -3,24 +3,6 @@ import { createClient } from "@/utils/supabase/server";
 import { QueueEntry } from "@/types/db";
 import { Barber } from "@/types/db";
 
-// Get current tenant id
-export async function getCurrentTenantId(): Promise<string> {
-  const headerResult = await headers();
-  const slug = headerResult.get("x-tenant-slug");
-  if (!slug) throw new Error("Missing tenant slug");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("tenants")
-    .select("id")
-    .eq("slug", slug)
-    .single();
-
-  if (error || !data) throw new Error("Invalid tenant");
-
-  return data.id as string;
-}
-
 // Fetch all queue entries
 export async function getAllQueue(): Promise<QueueEntry[] | null> {
   const hedersResult = await headers();

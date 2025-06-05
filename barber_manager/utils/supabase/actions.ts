@@ -69,8 +69,8 @@ export async function addToQueue(
 
 // Assign a barber to a queue entry
 export async function assignBarberToQueueEntry(
-  queueEntryId: number,
-  barberId: number
+  queueEntryId: string,
+  barberId: string
 ): Promise<ServerActionReturn> {
   // Assign barberId to null in case it's not provided
   try {
@@ -95,7 +95,7 @@ export async function assignBarberToQueueEntry(
 
 // Update service status
 export async function updateServiceStatus(
-  queueEntryId: number,
+  queueEntryId: string,
   newStatus: string
 ): Promise<ServerActionReturn> {
   const supabase = await createClient();
@@ -139,7 +139,7 @@ export async function updateServiceStatus(
 
 // Toggle staff status
 export async function toggleStaffStatus(
-  staffId: number,
+  staffId: string,
   newStatus: string
 ): Promise<ServerActionReturn> {
   try {
@@ -171,9 +171,7 @@ export async function toggleShopStatus(): Promise<ServerActionReturn> {
   try {
     const supabase = await createClient();
     const currentIsOpen = await getShopStatus();
-    console.log("Current isOpen:", currentIsOpen);
     const newStatus = currentIsOpen === "yes" ? "no" : "yes";
-    console.log("New isOpen:", newStatus);
     const { data, error } = await supabase
       .from("business_settings")
       .update({ value: newStatus })
