@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 export default function OpenCloseShopButton() {
   const shopIsOpen = useShopStatus();
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null | undefined>(null);
 
   const handleToggle = async () => {
     if (isLoading) return;
