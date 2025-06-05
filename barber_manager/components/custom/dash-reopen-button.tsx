@@ -3,12 +3,13 @@ import { cn } from "@/utils/utils";
 import { Button } from "../ui/button";
 import { updateServiceStatus } from "@/utils/supabase/actions";
 import UseAsyncAction from "@/hooks/use-async-action";
+import { QueueEntry } from "@/types/db";
 
 export default function DashReopenButton({
   queueEntryId,
   status,
 }: {
-  queueEntryId: number;
+  queueEntryId: QueueEntry["id"];
   status: string;
 }) {
   const {

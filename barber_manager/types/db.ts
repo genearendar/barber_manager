@@ -63,7 +63,7 @@ export type QueueEntry = {
   status: QueueStatus;
   started_at: string | null;
   finished_at: string | null;
-  barber_id: number | null;
+  barber_id: string | null;
 };
 
 export type Barber = {

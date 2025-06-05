@@ -15,7 +15,7 @@ export default function DashQueueTableRow({
 }: {
   queueEntry: QueueEntry;
   staffData: Barber[] | null | undefined;
-  busyBarbers: (number | null)[] | undefined;
+  busyBarbers: (string | null)[] | undefined;
 }) {
   /** Filter staffData for Select element to include only onsite staff and the current barber 
   (to preserve the name on disabled selects for finished entries) */
@@ -24,14 +24,13 @@ export default function DashQueueTableRow({
   );
 
   // State to track selected barber
-  const [selectedBarberId, setSelectedBarberId] = useState<number | null>(
+  const [selectedBarberId, setSelectedBarberId] = useState<string | null>(
     queueEntry.barber_id
   );
   async function handleBarberSelectionChange(
     event: ChangeEvent<HTMLSelectElement>
   ) {
-    const newSelectedBarberId =
-      Number(event.target.value) > 0 ? Number(event.target.value) : null;
+    const newSelectedBarberId = event.target.value;
     const previousSelectedBarberId = selectedBarberId; // Store current state value
 
     setSelectedBarberId(newSelectedBarberId); // Optimistically update UI
@@ -41,8 +40,8 @@ export default function DashQueueTableRow({
         `Attempting to assign barber ${newSelectedBarberId} to entry ${queueEntry.id}`
       );
       const result = await assignBarberToQueueEntry(
-        queueEntry.id as number,
-        newSelectedBarberId as number
+        queueEntry.id,
+        newSelectedBarberId as string
       );
       console.log("Assignment result:", result);
 
@@ -85,7 +84,7 @@ export default function DashQueueTableRow({
           <option value="">-- No barber assigned --</option>
           {selectableStaff &&
             selectableStaff.map((barber) => (
-              <option key={barber.id} value={barber.id as number}>
+              <option key={barber.id} value={barber.id}>
                 {barber.first_name}
               </option>
             ))}

@@ -28,11 +28,11 @@ export default function DashQueueTable({
     ?.filter((entry) => entry.status === "in progress")
     .map((entry) => entry.barber_id);
   // Sort queue entries by status and create elements
-  const statusOrder = ["in progress", "waiting", "finished", "cancelled"];
+  const STATUS_ORDER = ["in progress", "waiting", "finished", "cancelled"];
   const queueElements = realtimeQueue
     ?.sort((a, b) => {
-      const aStatusIndex = statusOrder.indexOf(a.status);
-      const bStatusIndex = statusOrder.indexOf(b.status);
+      const aStatusIndex = STATUS_ORDER.indexOf(a.status);
+      const bStatusIndex = STATUS_ORDER.indexOf(b.status);
 
       // Primary sort: by status category (e.g., all 'in progress' come before 'waiting')
       if (aStatusIndex !== bStatusIndex) {

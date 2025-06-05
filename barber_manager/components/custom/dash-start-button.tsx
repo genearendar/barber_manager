@@ -3,6 +3,7 @@ import { cn } from "@/utils/utils";
 import { Button } from "../ui/button";
 import { updateServiceStatus } from "@/utils/supabase/actions";
 import UseAsyncAction from "@/hooks/use-async-action";
+import { Barber, QueueEntry } from "@/types/db";
 
 export default function DashStartButton({
   queueEntryId,
@@ -10,10 +11,10 @@ export default function DashStartButton({
   selectedBarberId,
   busyBarbers,
 }: {
-  queueEntryId: number;
-  status: string;
-  selectedBarberId: number | null;
-  busyBarbers: (number | null)[] | undefined;
+  queueEntryId: QueueEntry["id"];
+  status: QueueEntry["status"];
+  selectedBarberId: Barber["id"] | null;
+  busyBarbers: (string | null)[] | undefined;
 }) {
   const {
     execute: updateService,
@@ -21,7 +22,7 @@ export default function DashStartButton({
     isSuccess,
     message,
   } = UseAsyncAction(updateServiceStatus);
-  const barberIsBusy = busyBarbers?.includes(selectedBarberId || 0) || false;
+  const barberIsBusy = busyBarbers?.includes(selectedBarberId) || false;
   // Text logic
   let buttonText = "Start";
   if (status === "in progress") {
