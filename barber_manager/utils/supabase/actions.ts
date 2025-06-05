@@ -5,9 +5,7 @@ import { getShopStatus } from "./queries";
 import { Barber, QueueStatus, ServerActionReturn } from "@/types/db";
 
 // Add a new queue entry
-export async function addToQueue(
-  formData: FormData
-): Promise<ServerActionReturn> {
+export async function addToQueue(formData: FormData): Promise<any> {
   const supabase = await createClient();
 
   // Extract form data
@@ -19,14 +17,14 @@ export async function addToQueue(
     return {
       success: false,
       message: "Name is required",
-    };
+    } as ServerActionReturn;
   }
 
   if (name.length > 50) {
     return {
       success: false,
       message: "Name must be less than 50 characters",
-    };
+    } as ServerActionReturn;
   }
 
   try {
@@ -46,7 +44,7 @@ export async function addToQueue(
       return {
         success: false,
         message: "Failed to add to queue. Please try again.",
-      };
+      } as ServerActionReturn;
     }
 
     // Revalidate the page to show updated data
@@ -57,13 +55,13 @@ export async function addToQueue(
       success: true,
       message: "Added to queue successfully",
       data: data,
-    };
+    } as ServerActionReturn;
   } catch (error) {
     console.error("Unexpected error:", error);
     return {
       success: false,
       message: "An unexpected error occurred",
-    };
+    } as ServerActionReturn;
   }
 }
 
