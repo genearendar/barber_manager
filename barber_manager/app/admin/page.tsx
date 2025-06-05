@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { getAllCurrentStaff, getCurrentTenantId } from "@/utils/supabase/queries";
+import { getAllCurrentStaff } from "@/utils/supabase/queries";
 import AdminStaffEntry from "@/components/custom/admin-staff-entry";
 import OpenCloseShopButton from "@/components/custom/open-close-shop-button";
 import { get } from "http";
