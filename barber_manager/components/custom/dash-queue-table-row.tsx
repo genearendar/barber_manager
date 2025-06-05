@@ -19,10 +19,11 @@ export default function DashQueueTableRow({
 }) {
   /** Filter staffData for Select element to include only onsite staff and the current barber 
   (to preserve the name on disabled selects for finished entries) */
+
   const selectableStaff = staffData?.filter(
     (staff) => staff.status !== "offsite" || staff.id === queueEntry.barber_id
   );
-
+  console.log("Selectable barbers:", selectableStaff);
   // State to track selected barber
   const [selectedBarberId, setSelectedBarberId] = useState<string | null>(
     queueEntry.barber_id
@@ -30,20 +31,16 @@ export default function DashQueueTableRow({
   async function handleBarberSelectionChange(
     event: ChangeEvent<HTMLSelectElement>
   ) {
-    const newSelectedBarberId = event.target.value;
+    const newSelectedBarberId = event.target.value || null;
     const previousSelectedBarberId = selectedBarberId; // Store current state value
 
     setSelectedBarberId(newSelectedBarberId); // Optimistically update UI
 
     try {
-      console.log(
-        `Attempting to assign barber ${newSelectedBarberId} to entry ${queueEntry.id}`
-      );
       const result = await assignBarberToQueueEntry(
         queueEntry.id,
         newSelectedBarberId as string
       );
-      console.log("Assignment result:", result);
 
       if (!result.success) {
         // Revert on failure
