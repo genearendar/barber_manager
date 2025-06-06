@@ -48,7 +48,6 @@ export default function useAsyncAction<
     setMessage(null);
     setData(null);
   }, []);
-
   // The main function to execute the async action
   const execute = useCallback(
     async (...args: TArgs) => {
@@ -74,7 +73,7 @@ export default function useAsyncAction<
           if (options?.successMessageDuration !== 0) {
             setTimeout(
               () => setMessage(null),
-              options?.successMessageDuration || 1000
+              options?.successMessageDuration || 1500
             ); // Default to 3 seconds
           }
         } else {
