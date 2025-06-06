@@ -4,6 +4,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { QueueEntry, Barber } from "@/types/db";
 import { useState, ChangeEvent } from "react";
 import { assignBarberToQueueEntry } from "@/utils/supabase/actions";
+import { Scissors } from "lucide-react";
 import DashStartButton from "./dash-start-button";
 import DashCancelButton from "./dash-cancel-button";
 import DashReopenButton from "./dash-reopen-button";
@@ -89,7 +90,7 @@ export default function DashQueueTableRow({
           {selectableStaff &&
             selectableStaff.map((barber) => (
               <option key={barber.id} value={barber.id}>
-                {barber.first_name}
+                ✂️ {barber.first_name}
               </option>
             ))}
         </select>
