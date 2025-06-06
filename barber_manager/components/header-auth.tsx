@@ -6,7 +6,6 @@ import { User } from "@supabase/supabase-js";
 export default function AuthButton({ user }: { user: User | null }) {
   return user ? (
     <div className="flex items-center gap-4">
-      <span>Welcome!</span>
       <form action={signOutAction}>
         <Button type="submit" variant={"outline"}>
           Sign out
