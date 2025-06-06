@@ -74,7 +74,7 @@ export default function DashQueueTable({
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody>{queueElements}</TableBody>
+      <TableBody className="grid gap-4 md:table-row-group">{queueElements}</TableBody>
     </Table>
   );
 }
