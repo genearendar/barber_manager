@@ -23,11 +23,15 @@ export default function DashQueueTableRow({
   const selectableStaff = staffData?.filter(
     (staff) => staff.status !== "offsite" || staff.id === queueEntry.barber_id
   );
-  console.log("Selectable barbers:", selectableStaff);
   // State to track selected barber
   const [selectedBarberId, setSelectedBarberId] = useState<string | null>(
     queueEntry.barber_id
   );
+
+  // Filter staffData for barbers on break (used to prevent barbers on break to start a job)
+  const barbersOnBreak = staffData
+    ?.filter((staff) => staff.status === "break")
+    .map((staff) => staff.id);
   async function handleBarberSelectionChange(
     event: ChangeEvent<HTMLSelectElement>
   ) {
@@ -57,9 +61,11 @@ export default function DashQueueTableRow({
   }
 
   return (
-    <TableRow>
-      <TableCell className="w-1/6 font-medium">{queueEntry.name}</TableCell>
-      <TableCell className="w-1/6 font-medium">
+    <TableRow className="grid align-middle grid-cols-2 sm:grid-cols-3 md:table-row">
+      <TableCell className="font-medium self-center sm:order-first md:w-1/4">
+        {queueEntry.name}
+      </TableCell>
+      <TableCell className="font-medium self-center justify-self-end md:justify-self-auto md:w-1/4">
         <span
           className={cn("block w-24 p-2 rounded-md text-center", {
             "bg-yellow-500": queueEntry.status === "waiting",
@@ -71,9 +77,10 @@ export default function DashQueueTableRow({
           {queueEntry.status}
         </span>
       </TableCell>
-      <TableCell className="w-1/5 font-medium">
+      <TableCell className="font-medium col-span-full self-center sm:col-span-1 sm:order-first md:w-1/4">
         <select
-          className="bg-accent text-sm p-3 px-5 rounded-md w-full"
+          className="bg-accent text-sm p-3 px-5 rounded-md min-w-24"
+          name="barberSelection"
           value={selectedBarberId ? selectedBarberId : ""}
           onChange={handleBarberSelectionChange}
           disabled={queueEntry.status !== "waiting"}
@@ -87,13 +94,14 @@ export default function DashQueueTableRow({
             ))}
         </select>
       </TableCell>
-      <TableCell className="w-1/5 font-medium">
+      <TableCell className="font-medium md:w-1/4">
         <div className="flex gap-6">
           <DashStartButton
             queueEntryId={queueEntry.id}
             status={queueEntry.status}
             selectedBarberId={selectedBarberId}
             busyBarbers={busyBarbers}
+            barbersOnBreak={barbersOnBreak}
           />
           <DashCancelButton
             queueEntryId={queueEntry.id}

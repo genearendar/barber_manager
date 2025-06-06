@@ -10,11 +10,13 @@ export default function DashStartButton({
   status,
   selectedBarberId,
   busyBarbers,
+  barbersOnBreak,
 }: {
   queueEntryId: QueueEntry["id"];
   status: QueueEntry["status"];
   selectedBarberId: Barber["id"] | null;
-  busyBarbers: (string | null)[] | undefined;
+  busyBarbers: (Barber["id"] | null)[] | undefined;
+  barbersOnBreak: Barber["id"][] | undefined;
 }) {
   const {
     execute: updateService,
@@ -23,22 +25,26 @@ export default function DashStartButton({
     message,
   } = UseAsyncAction(updateServiceStatus);
   const barberIsBusy = busyBarbers?.includes(selectedBarberId) || false;
+  const barberIsOnBreak =
+    (selectedBarberId && barbersOnBreak?.includes(selectedBarberId)) || false;
   // Text logic
   let buttonText = "Start";
   if (status === "in progress") {
     buttonText = "Finish";
-  } else if (!selectedBarberId) {
-    buttonText = " < Assign Barber";
   }
   // Enabled logic. The button should be disabled if
   // the status is finished, cancelled, no barber is selected,
   // can't start if selected barber is busy (only one job at a time)
+  // or if selected barber is on break
   let disabled = false;
   if (
     status === "finished" ||
     status === "cancelled" ||
     !selectedBarberId ||
-    (barberIsBusy && status === "waiting")
+    (barberIsOnBreak && status === "waiting") ||
+    // cannot start if selected barber is busy
+    (barberIsBusy && status === "waiting") ||
+    isLoading
   ) {
     disabled = true;
   }
@@ -50,23 +56,31 @@ export default function DashStartButton({
   let statusToUpdate = status === "in progress" ? "finished" : "in progress";
   return (
     visible && (
-      <>
+      <div className="flex flex-col gap-2">
         <Button
           className={cn(
-            "w-40 bg-green-600 hover:bg-green-500",
-            status === "cancelled" && "bg-red-300",
-            status === "finished" && "bg-blue-300"
+            "w-[140px] bg-green-600 hover:bg-green-500",
+            status === "in progress" && "bg-blue-600 hover:bg-blue-500"
           )}
           variant="default"
           onClick={() => updateService(queueEntryId, statusToUpdate)}
-          disabled={disabled || isLoading}
+          disabled={disabled}
         >
           {buttonText}
         </Button>
+        {disabled && !isLoading && barberIsOnBreak && (
+          <p className="text-xs text-slate-800">Barber is on break</p>
+        )}
+        {disabled && !isLoading && barberIsBusy && (
+          <p className="text-xs text-slate-800">Barber is busy</p>
+        )}
+        {disabled && !isLoading && !selectedBarberId && (
+          <p className="text-xs text-slate-800">Assign a barber to start</p>
+        )}
         {isSuccess === false && (
           <p className="text-xs text-red-500">{message}</p>
         )}
-      </>
+      </div>
     )
   );
 }

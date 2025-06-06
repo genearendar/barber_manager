@@ -24,6 +24,7 @@ export default function DashQueueTable({
     staffData
   );
   //Get busy barbers to pass this on to the start button
+  // Ids of Barbers who have an entry in progress
   const busyBarbers = realtimeQueue
     ?.filter((entry) => entry.status === "in progress")
     .map((entry) => entry.barber_id);
@@ -66,8 +67,8 @@ export default function DashQueueTable({
     <Table>
       <TableCaption>Today's queue</TableCaption>
       <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Customer</TableHead>
+        <TableRow className="hidden md:table-row">
+          <TableHead>Customer</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Barber</TableHead>
           <TableHead>Actions</TableHead>

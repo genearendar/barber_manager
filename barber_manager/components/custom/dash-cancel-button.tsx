@@ -22,8 +22,8 @@ export default function DashCancelButton({
   return (
     visible && (
       <Button
-        className="bg-red-500 hover:bg-red-400"
-        variant="default"
+        className="text-red-600"
+        variant="link"
         onClick={handleClick}
       >
         Cancel
