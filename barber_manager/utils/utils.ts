@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { Barber } from "@/types/db";
+import { Barber, QueueEntry } from "@/types/db";
 /**
  * Redirects to a specified path with an encoded message as a query parameter.
  * @param {('error' | 'success')} type - The type of message, either 'error' or 'success'.
@@ -25,14 +25,26 @@ export function cn(...inputs: ClassValue[]) {
 // Calculate wait time for a queue entry
 export function calculateWaitTime(
   staffData: Barber[] | null | undefined,
+  queueData: QueueEntry[] | null | undefined,
   positionInQueue: number
 ) {
   const AVG_WAIT_TIME = 15; // Average wait time in minutes
-  const availableStaff =
-    staffData && staffData.filter((staff) => staff.status === "onsite").length;
-  const waitTime =
-    availableStaff &&
-    AVG_WAIT_TIME * Math.ceil((positionInQueue + 1) / availableStaff);
-  return availableStaff ? `${waitTime} min` : "no staff available";
-}
+  const customersInChairs =
+    queueData?.filter((entry) => entry.status === "in progress").length || 0;
 
+  // Only counts those staff that are onsite but not on break
+  const staffOnsite =
+    (staffData &&
+      staffData.filter((staff) => staff.status === "onsite").length) ||
+    0;
+  const freeBarbers = staffOnsite - customersInChairs;
+
+  if (freeBarbers && freeBarbers >= positionInQueue) {
+    return "now";
+  }
+  // Calculates using the average wait time not counting customers who are to be served right now
+  const waitTime =
+    staffOnsite &&
+    AVG_WAIT_TIME * Math.ceil((positionInQueue - freeBarbers) / staffOnsite);
+  return staffOnsite ? `${waitTime} min` : "no staff available";
+}

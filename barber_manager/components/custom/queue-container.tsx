@@ -36,14 +36,13 @@ export default function QueueContainer({
           <span className="text-2xl">✂️</span>
         </div>
 
-        {/* <p>{entry.status}</p> */}
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Clock className="h-5 w-5 text-gray-800" />
             <p className="text-md ml-2">Est. wait</p>
           </div>
           <div className="text-xl font-bold text-gray-900">
-            {calculateWaitTime(realtimeStaff, index)}
+            {calculateWaitTime(realtimeStaff, realtimeQueue, index+1, )}
           </div>
         </div>
       </div>
