@@ -35,7 +35,6 @@ export default function HeaderNavMobile({
       )
     )
   );
-  console.log("is open: ", isOpen);
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger className="md:hidden">

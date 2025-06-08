@@ -1,8 +1,7 @@
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { getShopStatus } from "@/utils/supabase/queries";
-// import { headers } from "next/headers";
+import { headers } from "next/headers";
 import Header from "@/components/custom/header";
 import "./globals.css";
 import ShopStatusProvider from "@/contexts/shop-status-context";
@@ -27,8 +26,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // // const headersList = await headers();
-  // const tenantId = headersList.get("x-tenant-id");
+  const headersList = await headers();
+  const tenantId = headersList.get("x-tenant-id");
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">

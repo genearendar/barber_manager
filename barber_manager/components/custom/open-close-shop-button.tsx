@@ -42,7 +42,7 @@ export default function OpenCloseShopButton() {
   // }
 
   // const isOpen = shopIsOpen === "yes";
-
+  console.log("shopIsOpen", shopIsOpen);
   return (
     <div className="space-y-2">
       <Button

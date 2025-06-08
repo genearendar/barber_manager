@@ -1,8 +1,8 @@
 "use client";
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { getShopStatus } from "@/utils/supabase/queries";
 
 // Shop status context
 export const ShopStatusContext = createContext<boolean | null>(null);
@@ -16,18 +16,34 @@ export default function ShopStatusProvider({
 }) {
   const [shopIsOpen, setShopIsOpen] = useState<boolean | null>(null);
 
+  // Get shop status from the client side. IMPORTANT not to mix with the sam function in queries.ts file
+  async function getShopStatus(): Promise<string | any> {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("tenants")
+      .select("settings")
+      .eq("id", tenantId)
+      .single();
+    if (error) {
+      console.error("Error fetching shop status:", error.message);
+    }
+    const status = data?.settings.is_open;
+    console.log("Shop hook data:", status);
+    return status as boolean | null;
+  }
   // Subscribe to shop status updates realtime
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const shopIsOpen: boolean | null = await getShopStatus(tenantId);
-        setShopIsOpen(shopIsOpen ? shopIsOpen : null);
+        const isOpen: boolean | null = await getShopStatus();
+        setShopIsOpen(isOpen ? !isOpen : true);
       } catch (error) {
         setShopIsOpen(null);
         console.error("Error fetching shop status:", error);
       }
     };
     let subscription: RealtimeChannel | null = null;
+
     const setupSubscription = async () => {
       const supabase = await createClient();
       subscription = supabase
@@ -43,17 +59,9 @@ export default function ShopStatusProvider({
           (payload) => {
             if (payload.new) {
               const newSettings = payload.new.settings;
-              // Ensure newSettings is an object and has the 'is_open' property
-              if (newSettings && typeof newSettings.is_open === "boolean") {
-                const isOpen = newSettings.is_open;
-                setShopIsOpen(isOpen);
-              } else {
-                // Handle cases where settings or is_open might be missing or malformed
-                console.warn(
-                  "Received update, but 'is_open' was not found or not a boolean in settings:",
-                  payload.new
-                );
-              }
+              console.log("New settings:", newSettings);
+              const isOpen = newSettings.is_open;
+              setShopIsOpen(isOpen);
             }
           }
         )
@@ -61,7 +69,7 @@ export default function ShopStatusProvider({
 
       return subscription;
     };
-
+    fetchStatus();
     setupSubscription();
 
     return () => {

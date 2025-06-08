@@ -102,9 +102,9 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
 // }
 
 // Get shop status
-export async function getShopStatus(tenantId: string | null): Promise<boolean | null> {
-  // const headersResult = await headers();
-  // const tenantId = headersResult.get("x-tenant-id");
+export async function getShopStatus(): Promise<boolean | null> {
+  const headersResult = await headers();
+  const tenantId = headersResult.get("x-tenant-id");
 
   // --- Error handling for missing tenantId ---
   if (!tenantId) {
