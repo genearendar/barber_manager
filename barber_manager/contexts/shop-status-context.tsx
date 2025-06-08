@@ -1,43 +1,33 @@
 "use client";
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { getShopStatus } from "@/utils/supabase/queries";
 
 // Shop status context
-export const ShopStatusContext = createContext<string | null>(null);
+export const ShopStatusContext = createContext<boolean | null>(null);
 
 export default function ShopStatusProvider({
   children,
+  tenantId,
 }: {
   children: React.ReactNode;
+  tenantId: string | null;
 }) {
-  const [shopIsOpen, setShopIsOpen] = useState<string | null>(null);
-  async function getShopStatus(): Promise<string | any> {
-    const supabase = await createClient();
-    const { data: status, error } = await supabase
-      .from("business_settings")
-      .select("value")
-      .eq("key", "is_open")
-      .single();
-    if (error) {
-      console.error("Error fetching shop status:", error.message);
-    }
-    return status?.value as string | null;
-  }
+  const [shopIsOpen, setShopIsOpen] = useState<boolean | null>(null);
+
   // Subscribe to shop status updates realtime
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const isOpen: string | null = await getShopStatus();
-        setShopIsOpen(isOpen);
+        const shopIsOpen: boolean | null = await getShopStatus(tenantId);
+        setShopIsOpen(shopIsOpen ? shopIsOpen : null);
       } catch (error) {
         setShopIsOpen(null);
         console.error("Error fetching shop status:", error);
       }
     };
     let subscription: RealtimeChannel | null = null;
-
     const setupSubscription = async () => {
       const supabase = await createClient();
       subscription = supabase
@@ -47,13 +37,23 @@ export default function ShopStatusProvider({
           {
             event: "UPDATE",
             schema: "public",
-            table: "business_settings",
-            filter: "key=eq.is_open",
+            table: "tenants",
+            filter: `id=eq.${tenantId}`,
           },
           (payload) => {
             if (payload.new) {
-              const isOpen = payload.new.value;
-              setShopIsOpen(isOpen);
+              const newSettings = payload.new.settings;
+              // Ensure newSettings is an object and has the 'is_open' property
+              if (newSettings && typeof newSettings.is_open === "boolean") {
+                const isOpen = newSettings.is_open;
+                setShopIsOpen(isOpen);
+              } else {
+                // Handle cases where settings or is_open might be missing or malformed
+                console.warn(
+                  "Received update, but 'is_open' was not found or not a boolean in settings:",
+                  payload.new
+                );
+              }
             }
           }
         )
@@ -61,7 +61,7 @@ export default function ShopStatusProvider({
 
       return subscription;
     };
-    fetchStatus();
+
     setupSubscription();
 
     return () => {

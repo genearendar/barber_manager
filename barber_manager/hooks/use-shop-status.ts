@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { ShopStatusContext } from "@/contexts/shop-status-context";
 
-export function useShopStatus() {
+export default function useShopStatus() {
   const shopIsOpen = useContext(ShopStatusContext);
 
   if (shopIsOpen === undefined) {

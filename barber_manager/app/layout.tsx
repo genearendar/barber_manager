@@ -1,6 +1,8 @@
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { getShopStatus } from "@/utils/supabase/queries";
+// import { headers } from "next/headers";
 import Header from "@/components/custom/header";
 import "./globals.css";
 import ShopStatusProvider from "@/contexts/shop-status-context";
@@ -20,11 +22,13 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // // const headersList = await headers();
+  // const tenantId = headersList.get("x-tenant-id");
   return (
     <html lang="en" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
@@ -34,7 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ShopStatusProvider>
+          <ShopStatusProvider tenantId={tenantId}>
             <div className="min-h-screen flex flex-col items-center">
               <div className="flex-1 w-full max-w-7xl flex flex-col gap-20 items-center px-5 lg:px-16">
                 <Header />

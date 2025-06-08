@@ -45,6 +45,12 @@ export type Tenant = {
   owner_user_id: string; // uuid
 };
 
+export type TenantSettings = {
+  is_open: boolean; // Assuming 'is_open' will always be a boolean
+  // Add other settings properties here as they are added to the JSONB
+  [key: string]: any; // Allow for other properties if you don't want to define all upfront
+}
+
 export type User = {
   id: string; // uuid
   role: UserRole;

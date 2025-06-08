@@ -1,7 +1,8 @@
 "use server";
-import { createClient } from "./server";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getShopStatus } from "./queries";
+import { createClient } from "./server";
+import { getShopStatus, fetchTenantSettings } from "./queries";
 import { Barber, QueueStatus, TableName, ServerActionReturn } from "@/types/db";
 
 // Add a new queue entry
@@ -169,14 +170,24 @@ export async function toggleStaffStatus(
 
 // Toggle shop status to open or closed
 export async function toggleShopStatus(): Promise<ServerActionReturn> {
+  const headersResult = await headers();
+  const tenantId = headersResult.get("x-tenant-id");
+  // --- Error handling for missing tenantId ---
+  if (!tenantId) {
+    console.error("Error: Tenant ID is missing in getShopStatus call.");
+    throw new Error("Tenant ID not found. Cannot retrieve shop status.");
+  }
+
   try {
     const supabase = await createClient();
     const currentIsOpen = await getShopStatus();
-    const newStatus = currentIsOpen === "yes" ? "no" : "yes";
+    const newStatus = currentIsOpen === true ? false : true;
+    const currentSettings = await fetchTenantSettings(tenantId);
+    const newSettings = { ...currentSettings, is_open: newStatus };
     const { data, error } = await supabase
-      .from("business_settings")
-      .update({ value: newStatus })
-      .eq("key", "is_open")
+      .from("tenants")
+      .update({ settings: newSettings })
+      .eq("id", tenantId)
       .select();
     if (error) {
       console.error("Error updating shop status:", error);

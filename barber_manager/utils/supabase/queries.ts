@@ -1,12 +1,54 @@
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
-import { QueueEntry } from "@/types/db";
-import { Barber } from "@/types/db";
+import { QueueEntry, Barber, TenantSettings, Tenant } from "@/types/db";
+
+async function getTenantIdOrThrow(): Promise<string> {
+  const headersResult = await headers();
+  const tenantId = headersResult.get("x-tenant-id");
+  if (!tenantId) {
+    throw new Error(
+      "Missing tenant ID. This operation requires tenant context."
+    );
+  }
+  return tenantId;
+}
+
+/**
+ * Fetches the settings for the current tenant from the database.
+ * @returns A Promise that resolves to the TenantSettings object, or null if not found.
+ * @throws An error if the tenant ID is missing or a database error occurs.
+ */
+
+// Get any tenant's settings
+export async function fetchTenantSettings(
+  tenantId: Tenant["id"] | null
+): Promise<TenantSettings | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("settings") // Select the jsonb 'settings' column
+    .eq("id", tenantId) // Filter by the tenant's ID
+    .single();
+
+  if (error) {
+    console.error("Supabase error fetching tenant settings:", error.message);
+    throw new Error("Database error: Failed to retrieve tenant settings.");
+  }
+
+  // If no data is found (e.g., tenantId doesn't exist), or settings is null
+  if (!data || !data.settings) {
+    console.warn(`No settings found for tenant ID: ${tenantId}`);
+    return null; // Return null if no settings or tenant not found
+  }
+
+  return data.settings as TenantSettings;
+}
 
 // Fetch all queue entries
 export async function getAllQueue(): Promise<QueueEntry[] | null> {
-  const hedersResult = await headers();
-  const tenantId = hedersResult.get("x-tenant-id");
+  const headersResult = await headers();
+  const tenantId = headersResult.get("x-tenant-id");
   console.log("Tenant ID:", tenantId);
   const supabase = await createClient(); // Initialize your server-side Supabase client
 
@@ -14,6 +56,7 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
   const { data: queue, error } = await supabase
     .from("queue")
     .select("id, name, created_at, status, started_at, finished_at, barber_id") // Select all columns from your table
+    .eq("tenant_id", tenantId)
     .order("created_at", { ascending: true }); // Order by creation time
 
   if (error) {
@@ -26,11 +69,14 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
 
 // Fetch all current staff
 export async function getAllCurrentStaff(): Promise<Barber[] | null> {
+  const headersResult = await headers();
+  const tenantId = headersResult.get("x-tenant-id");
   const supabase = await createClient();
   const { data: staff, error } = await supabase
     .from("barbers")
     .select("id, first_name, last_name, status")
     .eq("is_current", true)
+    .eq("tenant_id", tenantId)
     .order("first_name", { ascending: true });
   if (error) {
     console.error("Error fetching staff:", error.message);
@@ -38,30 +84,58 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
   return staff;
 }
 
-// Fetch available staff
-export async function getAvailableStaff(): Promise<Barber[] | null> {
-  const supabase = await createClient();
-  const { data: staff, error } = await supabase
-    .from("barbers")
-    .select("id, first_name, last_name, status")
-    .eq("status", "onsite")
-    .order("first_name", { ascending: true });
-  if (error) {
-    console.error("Error fetching staff:", error.message);
-  }
-  return staff;
-}
+// // Fetch available staff
+// export async function getAvailableStaff(): Promise<Barber[] | null> {
+//   const headersResult = await headers();
+//   const tenantId = headersResult.get("x-tenant-id");
+//   const supabase = await createClient();
+//   const { data: staff, error } = await supabase
+//     .from("barbers")
+//     .select("id, first_name, last_name, status")
+//     .eq("status", "onsite")
+//     .eq("tenant_id", tenantId)
+//     .order("first_name", { ascending: true });
+//   if (error) {
+//     console.error("Error fetching staff:", error.message);
+//   }
+//   return staff;
+// }
 
 // Get shop status
-export async function getShopStatus(): Promise<string | any> {
+export async function getShopStatus(tenantId: string | null): Promise<boolean | null> {
+  // const headersResult = await headers();
+  // const tenantId = headersResult.get("x-tenant-id");
+
+  // --- Error handling for missing tenantId ---
+  if (!tenantId) {
+    console.error("Error: Tenant ID is missing in getShopStatus call.");
+    throw new Error("Tenant ID not found. Cannot retrieve shop status.");
+  }
+
   const supabase = await createClient();
-  const { data: isOpen, error } = await supabase
-    .from("business_settings")
-    .select("value")
-    .eq("key", "is_open")
+
+  // Fetch the 'settings' column from the 'tenants' table
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("settings")
+    .eq("id", tenantId)
     .single();
+
   if (error) {
     console.error("Error fetching shop status:", error.message);
+    return null;
   }
-  return isOpen?.value as string | null;
+
+  // If no data is found (e.g., tenantId doesn't exist), or settings is null
+  if (!data || !data.settings) {
+    console.warn(`No settings found for tenant ID: ${tenantId}`);
+    return null;
+  }
+
+  const tenantSettings: TenantSettings = data.settings as TenantSettings;
+
+  // Return the 'is_open' property. Default to false if it's missing or not a boolean.
+  return typeof tenantSettings.is_open === "boolean"
+    ? tenantSettings.is_open 
+    : null;
 }
