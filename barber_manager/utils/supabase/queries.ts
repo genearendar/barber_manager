@@ -2,7 +2,8 @@ import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { QueueEntry, Barber, TenantSettings, Tenant } from "@/types/db";
 
-async function getTenantIdOrThrow(): Promise<string> {
+// Get tenant ID
+async function getTenantIdOrThrow(): Promise<Tenant["id"]> {
   const headersResult = await headers();
   const tenantId = headersResult.get("x-tenant-id");
   if (!tenantId) {
@@ -18,7 +19,6 @@ async function getTenantIdOrThrow(): Promise<string> {
  * @returns A Promise that resolves to the TenantSettings object, or null if not found.
  * @throws An error if the tenant ID is missing or a database error occurs.
  */
-
 // Get any tenant's settings
 export async function fetchTenantSettings(
   tenantId: Tenant["id"] | null
@@ -47,9 +47,8 @@ export async function fetchTenantSettings(
 
 // Fetch all queue entries
 export async function getAllQueue(): Promise<QueueEntry[] | null> {
-  const headersResult = await headers();
-  const tenantId = headersResult.get("x-tenant-id");
-  console.log("Tenant ID:", tenantId);
+  const tenantId = await getTenantIdOrThrow();
+
   const supabase = await createClient(); // Initialize your server-side Supabase client
 
   // Select all necessary columns
@@ -69,8 +68,8 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
 
 // Fetch all current staff
 export async function getAllCurrentStaff(): Promise<Barber[] | null> {
-  const headersResult = await headers();
-  const tenantId = headersResult.get("x-tenant-id");
+  const tenantId = await getTenantIdOrThrow();
+
   const supabase = await createClient();
   const { data: staff, error } = await supabase
     .from("barbers")
@@ -103,39 +102,29 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
 
 // Get shop status
 export async function getShopStatus(): Promise<boolean | null> {
-  const headersResult = await headers();
-  const tenantId = headersResult.get("x-tenant-id");
+  const tenantId = await getTenantIdOrThrow();
+  const tenantSettings = await fetchTenantSettings(tenantId)
 
-  // --- Error handling for missing tenantId ---
-  if (!tenantId) {
-    console.error("Error: Tenant ID is missing in getShopStatus call.");
-    throw new Error("Tenant ID not found. Cannot retrieve shop status.");
-  }
+  // // Fetch the 'settings' column from the 'tenants' table
+  // const { data, error } = await supabase
+  //   .from("tenants")
+  //   .select("settings")
+  //   .eq("id", tenantId)
+  //   .single();
 
-  const supabase = await createClient();
-
-  // Fetch the 'settings' column from the 'tenants' table
-  const { data, error } = await supabase
-    .from("tenants")
-    .select("settings")
-    .eq("id", tenantId)
-    .single();
-
-  if (error) {
-    console.error("Error fetching shop status:", error.message);
-    return null;
-  }
+  // if (error) {
+  //   console.error("Error fetching shop status:", error.message);
+  //   return null;
+  // }
 
   // If no data is found (e.g., tenantId doesn't exist), or settings is null
-  if (!data || !data.settings) {
+  if (!tenantSettings) {
     console.warn(`No settings found for tenant ID: ${tenantId}`);
     return null;
   }
 
-  const tenantSettings: TenantSettings = data.settings as TenantSettings;
-
   // Return the 'is_open' property. Default to false if it's missing or not a boolean.
   return typeof tenantSettings.is_open === "boolean"
-    ? tenantSettings.is_open 
+    ? tenantSettings.is_open
     : null;
 }
