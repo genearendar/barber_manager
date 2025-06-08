@@ -28,7 +28,7 @@ export default function ShopStatusProvider({
       console.error("Error fetching shop status:", error.message);
     }
     const status = data?.settings.is_open;
-    console.log("Shop hook data:", status);
+    console.log("Shop hook fetched data:", status);
     return status as boolean | null;
   }
   // Subscribe to shop status updates realtime
@@ -36,7 +36,7 @@ export default function ShopStatusProvider({
     const fetchStatus = async () => {
       try {
         const isOpen: boolean | null = await getShopStatus();
-        setShopIsOpen(isOpen ? !isOpen : true);
+        setShopIsOpen(isOpen);
       } catch (error) {
         setShopIsOpen(null);
         console.error("Error fetching shop status:", error);
@@ -59,8 +59,8 @@ export default function ShopStatusProvider({
           (payload) => {
             if (payload.new) {
               const newSettings = payload.new.settings;
-              console.log("New settings:", newSettings);
               const isOpen = newSettings.is_open;
+              console.log("Setting context state to ", isOpen);
               setShopIsOpen(isOpen);
             }
           }
