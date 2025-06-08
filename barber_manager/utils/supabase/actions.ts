@@ -2,7 +2,11 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "./server";
-import { getShopStatus, fetchTenantSettings } from "./queries";
+import {
+  getShopStatus,
+  fetchTenantSettings,
+  getTenantIdOrThrow,
+} from "./queries";
 import { Barber, QueueStatus, TableName, ServerActionReturn } from "@/types/db";
 
 // Add a new queue entry
@@ -15,6 +19,7 @@ export async function addToQueue(
   // Extract form data
   const name = formData.get("name")?.toString().trim();
   const barberId = formData.get("barberSelection");
+  const tenantId = await getTenantIdOrThrow();
 
   // Validation
   if (!name || name.length < 2) {
@@ -39,6 +44,7 @@ export async function addToQueue(
         name: name,
         status: "waiting" as QueueStatus,
         barber_id: barberId ? (barberId as Barber["id"]) : null,
+        tenant_id: tenantId,
       })
       .select()
       .single();
@@ -74,6 +80,7 @@ export async function assignBarberToQueueEntry(
   queueEntryId: string,
   barberId: string
 ): Promise<ServerActionReturn> {
+  const tenantId = await getTenantIdOrThrow();
   // Assign barberId to null in case it's not provided
   try {
     const supabase = await createClient();
@@ -81,6 +88,7 @@ export async function assignBarberToQueueEntry(
       .from("queue")
       .update({ barber_id: barberId })
       .eq("id", queueEntryId)
+      .eq("tenant_id", tenantId)
       .select();
     if (error) {
       console.error("Error updating barber:", error);
@@ -101,7 +109,7 @@ export async function updateServiceStatus(
   newStatus: string
 ): Promise<ServerActionReturn> {
   const supabase = await createClient();
-
+  const tenantId = await getTenantIdOrThrow();
   try {
     const updates: {
       status: string;
@@ -125,6 +133,7 @@ export async function updateServiceStatus(
       .from("queue")
       .update(updates)
       .eq("id", queueEntryId)
+      .eq("tenant_id", tenantId)
       .select();
     if (error) {
       console.error("Error updating status:", error);
@@ -144,12 +153,14 @@ export async function toggleStaffStatus(
   staffId: string,
   newStatus: string
 ): Promise<ServerActionReturn> {
+  const tenantId = await getTenantIdOrThrow();
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("barbers")
       .update({ status: newStatus })
       .eq("id", staffId)
+      .eq("tenant_id", tenantId)
       .select();
     if (error) {
       console.error("Error updating staff status:", error);
@@ -170,13 +181,7 @@ export async function toggleStaffStatus(
 
 // Toggle shop status to open or closed
 export async function toggleShopStatus(): Promise<ServerActionReturn> {
-  const headersResult = await headers();
-  const tenantId = headersResult.get("x-tenant-id");
-  // --- Error handling for missing tenantId ---
-  if (!tenantId) {
-    console.error("Error: Tenant ID is missing in getShopStatus call.");
-    throw new Error("Tenant ID not found. Cannot retrieve shop status.");
-  }
+  const tenantId = await getTenantIdOrThrow();
 
   try {
     const supabase = await createClient();

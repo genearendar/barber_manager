@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { QueueEntry, Barber, TenantSettings, Tenant } from "@/types/db";
 
 // Get tenant ID
-async function getTenantIdOrThrow(): Promise<Tenant["id"]> {
+export async function getTenantIdOrThrow(): Promise<Tenant["id"]> {
   const headersResult = await headers();
   const tenantId = headersResult.get("x-tenant-id");
   if (!tenantId) {
@@ -103,19 +103,7 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
 // Get shop status
 export async function getShopStatus(): Promise<boolean | null> {
   const tenantId = await getTenantIdOrThrow();
-  const tenantSettings = await fetchTenantSettings(tenantId)
-
-  // // Fetch the 'settings' column from the 'tenants' table
-  // const { data, error } = await supabase
-  //   .from("tenants")
-  //   .select("settings")
-  //   .eq("id", tenantId)
-  //   .single();
-
-  // if (error) {
-  //   console.error("Error fetching shop status:", error.message);
-  //   return null;
-  // }
+  const tenantSettings = await fetchTenantSettings(tenantId);
 
   // If no data is found (e.g., tenantId doesn't exist), or settings is null
   if (!tenantSettings) {

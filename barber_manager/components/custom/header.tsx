@@ -23,7 +23,11 @@ export default async function Header() {
         {item.name}
       </Link>
     ) : (
-      user && <Link href={item.href}>{item.name}</Link>
+      user && (
+        <Link key={item.name} href={item.href}>
+          {item.name}
+        </Link>
+      )
     )
   );
   return (
