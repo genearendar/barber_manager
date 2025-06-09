@@ -1,41 +1,50 @@
-import { updateSession, getCurrentTenantId } from "@/utils/supabase/middleware";
-import { type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { authHandler } from "@/utils/middleware/auth-handler";
+import { tenantHandler } from "@/utils/middleware/tenant-handler";
+import { authorizationHandler } from "@/utils/middleware/authz-handler";
+
+// Array of middleware handlers to run in order
+const handlers = [
+  authHandler, // Handles authentication, session refresh, general protected routes
+  tenantHandler, // Resolves tenant, sets tenant headers
+  authorizationHandler, // Handles tenant-specific user authorization
+  // Add more handlers here if needed
+];
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // Start with a clone of the request headers to build the initial response.
+  // This ensures the first handler has a response object it can modify.
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  // Check if this is a tenant-specific route
-  const isTenantRoute =
-    pathname.startsWith("/") &&
-    pathname !== "/" &&
-    pathname !== "/error" &&
-    pathname !== "/not-found" &&
-    !pathname.startsWith("/tenant-select");
+  // Iterate through handlers,
+  // The key is to ALWAYS use the result of the previous handler as the input
+  // for the next one, or for the final return.
+  for (const handler of handlers) {
+    const handlerResult = await handler(request, response);
 
-  // in prod: pathname.match(/^\/[^\/]+\/(dashboard|queue|kiosk)/)
-
-  let response = await updateSession(request);
-
-  // Only resolve tenant for tenant routes
-  if (isTenantRoute) {
-    const tenantResponse = await getCurrentTenantId(request);
-    // If the tenantId response is a redirect, return it
-    if (tenantResponse.status >= 300 && tenantResponse.status < 400) {
-      return tenantResponse;
+    // If the handler returned a new response (e.g., a redirect),
+    // immediately return it and stop the chain.
+    if (handlerResult && handlerResult.headers.has("Location")) {
+      // Check for a redirect explicitly
+      return handlerResult;
     }
-    // If the tenantId response is successful, set the header
-    const tenantId = tenantResponse.headers.get("x-tenant-id");
-    if (tenantId) {
-      response.headers.set("x-tenant-id", tenantId);
-    }
+
+    // Otherwise, assume the handler has either modified the existing 'response' object
+    // or returned a new 'NextResponse.next()' which we should now use.
+    // The previous 'response' object is no longer relevant; always use 'handlerResult'.
+    response = handlerResult;
   }
 
+  // Return the final response after all handlers have run
   return response;
 }
 
 export const config = {
   matcher: [
-    // Only run on actual pages, not assets
-    "/((?!api|_next|favicon.ico|.*\\.).*)",
+    "/((?!api|_next|favicon.ico|.*\\.|sign-in|sign-up|not-found|error|tenant-select).*)",
   ],
 };
