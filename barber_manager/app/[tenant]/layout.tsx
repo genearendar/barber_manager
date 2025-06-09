@@ -48,10 +48,12 @@ export default async function TenantLayout({
   };
   return (
     <div className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full max-w-7xl flex flex-col gap-20 items-center px-5 lg:px-16">
+      <div className="flex-1 w-full flex flex-col gap-20 items-center">
         <TenantContextProvider tenantData={tenantClientData}>
           <TenantHeader tenant={tenantClientData} />
-          <main className="w-full flex flex-col gap-20">{children}</main>
+          <main className="w-full px-5 lg:px-16 flex flex-col items-center gap-20">
+            {children}
+          </main>
 
           <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
             <p>

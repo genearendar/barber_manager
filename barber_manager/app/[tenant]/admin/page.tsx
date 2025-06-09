@@ -14,7 +14,7 @@ export default async function ProtectedPage() {
     <AdminStaffEntry key={staff.id} staff={staff} />
   ));
   return (
-    <div className="flex-1 w-full flex flex-col gap-12">
+    <div className="w-full max-w-7xl flex flex-col gap-12">
       <h1>Main admin page. Content TBD</h1>
       <OpenCloseShopButton />
       {staffElements}

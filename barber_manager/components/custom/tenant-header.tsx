@@ -43,8 +43,8 @@ export default async function TenantHeader({
     )
   );
   return (
-    <header className="w-full">
-      <nav className="flex items-center justify-between border-b border-b-foreground/10 h-16 text-sm">
+    <header className="w-full px-5 lg:px-16 flex flex-col items-center border-b border-b-foreground/10">
+      <nav className="w-full max-w-7xl flex items-center justify-between h-16 text-sm">
         <div className="flex gap-5 items-center font-semibold">
           <Link href={"/"}>{tenant.name}</Link>
         </div>

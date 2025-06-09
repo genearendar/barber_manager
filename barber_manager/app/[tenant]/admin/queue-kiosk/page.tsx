@@ -8,7 +8,7 @@ export default async function QueueKioskPage() {
   const allStaff = await getAllCurrentStaff();
 
   return (
-    <div className="flex justify-center">
+    <div className="w-full max-w-7xl flex justify-center">
       <div className="w-xl">
         <h1 className="text-3xl text-center mb-4">Welcome!</h1>
         <KioskContainer>
