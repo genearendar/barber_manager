@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
-import { QueueEntry, Barber, TenantSettings, Tenant } from "@/types/db";
+import { QueueEntry, Barber, TenantSettings, Tenant, User } from "@/types/db";
 
 // Get tenant ID
 export async function getTenantIdOrThrow(): Promise<Tenant["id"]> {
@@ -69,6 +69,21 @@ export async function fetchTenant(
   }
 
   return data as Tenant;
+}
+
+export async function fetchUser(userId: string): Promise<User | null> {
+  const supabase = await createClient();
+  const {data, error} = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) {
+    console.error("Supabase error fetching user data:", error.message);
+    return null;
+  }
+  return data as User;
 }
 
 // Fetch all queue entries

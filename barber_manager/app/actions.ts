@@ -4,6 +4,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { fetchTenant, fetchUser } from "@/utils/supabase/queries";
 
 export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
@@ -15,7 +16,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/sign-up",
-      "Email and password are required",
+      "Email and password are required"
     );
   }
 
@@ -34,7 +35,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect(
       "success",
       "/sign-up",
-      "Thanks for signing up! Please check your email for a verification link.",
+      "Thanks for signing up! Please check your email for a verification link."
     );
   }
 };
@@ -44,7 +45,7 @@ export const signInAction = async (formData: FormData) => {
   const password = formData.get("password") as string;
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: authUserData, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -52,8 +53,18 @@ export const signInAction = async (formData: FormData) => {
   if (error) {
     return encodedRedirect("error", "/sign-in", error.message);
   }
+  // ---- Redirect to the user's tenant on success ---- //
 
-  return redirect("/admin");
+  // Get user data from public.users
+  const userData = await fetchUser(authUserData.user.id);
+  if (!userData) {
+    return redirect("/error");
+  }
+  // The the user's tenant and redirect to the slug
+  const userTenant = await fetchTenant(userData.tenant_id);
+  return userTenant
+    ? redirect(`/${userTenant.slug}/queue`)
+    : redirect("/error");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
@@ -75,7 +86,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
     return encodedRedirect(
       "error",
       "/forgot-password",
-      "Could not reset password",
+      "Could not reset password"
     );
   }
 
@@ -86,7 +97,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   return encodedRedirect(
     "success",
     "/forgot-password",
-    "Check your email for a link to reset your password.",
+    "Check your email for a link to reset your password."
   );
 };
 
@@ -100,16 +111,12 @@ export const resetPasswordAction = async (formData: FormData) => {
     encodedRedirect(
       "error",
       "/admin/reset-password",
-      "Password and confirm password are required",
+      "Password and confirm password are required"
     );
   }
 
   if (password !== confirmPassword) {
-    encodedRedirect(
-      "error",
-      "/admin/reset-password",
-      "Passwords do not match",
-    );
+    encodedRedirect("error", "/admin/reset-password", "Passwords do not match");
   }
 
   const { error } = await supabase.auth.updateUser({
@@ -117,11 +124,7 @@ export const resetPasswordAction = async (formData: FormData) => {
   });
 
   if (error) {
-    encodedRedirect(
-      "error",
-      "/admin/reset-password",
-      "Password update failed",
-    );
+    encodedRedirect("error", "/admin/reset-password", "Password update failed");
   }
 
   encodedRedirect("success", "/admin/reset-password", "Password updated");
