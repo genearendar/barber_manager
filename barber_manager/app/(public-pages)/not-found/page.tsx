@@ -1,4 +1,4 @@
-export default async function ErrorPage() {
+export default async function NotFoundPage() {
   return (
     <div className="flex flex-col gap-6 items-center">
       <h1 className="text-3xl">Sorry, seems like this shop does not exist in our database</h1>

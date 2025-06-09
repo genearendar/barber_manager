@@ -3,57 +3,42 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { Tenant } from "@/types/db";
+import { Tenant, ClientTenant } from "@/types/db";
 
 // Shop status context
-export const TenantContext = createContext<{
-  name: Tenant["name"];
-  slug: Tenant["slug"];
-  settings: Tenant["settings"];
-} | null>(null);
+export const TenantContext = createContext<ClientTenant | null>(null);
 
 export default function TenantContextProvider({
   children,
-  tenantId,
+  tenantData,
 }: {
   children: React.ReactNode;
-  tenantId: string | null;
+  tenantData: ClientTenant;
 }) {
-  const [tenantData, setTenantData] = useState<{
-    name: Tenant["name"];
-    slug: Tenant["slug"];
-    settings: Tenant["settings"];
-  } | null>(null);
+  const [tenant, setTenant] = useState<ClientTenant>(tenantData);
 
   // Get shop status from the client side. IMPORTANT not to mix with the same function in queries.ts file
-  async function getTenant(): Promise<{
-    name: Tenant["name"];
-    slug: Tenant["slug"];
-    settings: Tenant["settings"];
-  } | null> {
-    const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("tenants")
-      .select("name, slug, settings")
-      .eq("id", tenantId)
-      .single();
-    if (error) {
-      console.error("Error fetching tenant data:", error.message);
-    }
+  // async function getTenant(): Promise<{
+  //   name: Tenant["name"];
+  //   slug: Tenant["slug"];
+  //   settings: Tenant["settings"];
+  // } | null> {
+  //   const supabase = await createClient();
+  //   const { data, error } = await supabase
+  //     .from("tenants")
+  //     .select("name, slug, settings")
+  //     .eq("id", tenantId)
+  //     .single();
+  //   if (error) {
+  //     console.error("Error fetching tenant data:", error.message);
+  //   }
 
-    return data;
-  }
+  //   return data;
+  // }
   // Subscribe to shop settings updates realtime
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const tenant = await getTenant();
-        setTenantData(tenant);
-      } catch (error) {
-        setTenantData(null);
-        console.error("Error fetching tenant data:", error);
-      }
-    };
+    setTenant(tenantData);
+
     let subscription: RealtimeChannel | null = null;
 
     const setupSubscription = async () => {
@@ -66,31 +51,25 @@ export default function TenantContextProvider({
             event: "UPDATE",
             schema: "public",
             table: "tenants",
-            filter: `id=eq.${tenantId}`,
+            filter: `id=eq.${tenant.id}`,
           },
           (payload) => {
             if (payload.new) {
               const newSettings = payload.new.settings as Tenant["settings"];
               console.log("Setting context state to ", newSettings);
-              setTenantData(
+              setTenant(
                 (prev) =>
                   ({
                     ...prev,
                     settings: newSettings,
-                  }) as {
-                    name: Tenant["name"];
-                    slug: Tenant["slug"];
-                    settings: Tenant["settings"];
-                  } | null
+                  }) as ClientTenant
               );
             }
           }
         )
         .subscribe();
-
       return subscription;
     };
-    fetchSettings();
     setupSubscription();
 
     return () => {
@@ -99,8 +78,6 @@ export default function TenantContextProvider({
   }, []);
 
   return (
-    <TenantContext.Provider value={tenantData}>
-      {children}
-    </TenantContext.Provider>
+    <TenantContext.Provider value={tenant}>{children}</TenantContext.Provider>
   );
 }
