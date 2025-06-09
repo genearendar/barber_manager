@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/") &&
     pathname !== "/" &&
     pathname !== "/error" &&
+    pathname !== "/not-found" &&
     !pathname.startsWith("/tenant-select");
 
   // in prod: pathname.match(/^\/[^\/]+\/(dashboard|queue|kiosk)/)

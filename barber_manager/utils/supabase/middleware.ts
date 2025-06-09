@@ -29,7 +29,7 @@ export async function getCurrentTenantId(request: NextRequest) {
     .eq("slug", tenantSlug)
     .single();
   if (error || !data)
-    return NextResponse.redirect(new URL("/error", request.url));
+    return NextResponse.redirect(new URL("/not-found", request.url));
 
   const response = NextResponse.next();
   response.headers.set("x-tenant-id", data.id); // Set tenant ID instead of slug
