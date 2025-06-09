@@ -7,10 +7,10 @@ export default async function Home() {
       <h1 className="text-3xl text-center">Welcome to Barbershop Manager Demo!</h1>
       <div className="flex gap-6">
         <Button asChild>
-          <Link href={"/queue"}>Live queue</Link>
+          <Link href={"rollestonhaircuts/queue"}>Live queue</Link>
         </Button>
         <Button asChild>
-          <Link href={"/admin"}>Admin tools</Link>
+          <Link href={"rollestonhaircuts/admin"}>Admin tools</Link>
         </Button>
       </div>
     </div>

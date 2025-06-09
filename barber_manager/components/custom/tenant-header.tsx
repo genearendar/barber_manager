@@ -10,10 +10,18 @@ export default async function TenantHeader({
   tenant: ClientTenant;
 }) {
   const NAV_LINKS: { name: string; href: string; isPublic: boolean }[] = [
-    { name: "Queue", href: "queue", isPublic: true },
-    { name: "Admin", href: "admin", isPublic: false },
-    { name: "Dashboard", href: "admin/dashboard", isPublic: false },
-    { name: "Kiosk", href: "admin/queue-kiosk", isPublic: false },
+    { name: "Queue", href: `/${tenant.slug}/queue`, isPublic: true },
+    { name: "Admin", href: `/${tenant.slug}/admin`, isPublic: false },
+    {
+      name: "Dashboard",
+      href: `/${tenant.slug}/admin/dashboard`,
+      isPublic: false,
+    },
+    {
+      name: "Kiosk",
+      href: `/${tenant.slug}/admin/queue-kiosk`,
+      isPublic: false,
+    },
   ];
 
   const supabase = await createClient();

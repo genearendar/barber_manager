@@ -1,11 +1,14 @@
 import { useContext } from "react";
-import { ShopStatusContext } from "@/contexts/shop-status-context";
+import { TenantContext } from "@/contexts/tenant-context";
 
 export default function useShopStatus() {
-  const shopIsOpen = useContext(ShopStatusContext);
+  const tenantContext = useContext(TenantContext);
+  const shopIsOpen = tenantContext?.settings?.is_open;
 
   if (shopIsOpen === undefined) {
-    throw new Error("useShopStatus must be used within a ShopStatusProvider");
+    throw new Error(
+      "useShopStatus must be used within a TenantContextProvider"
+    );
   }
   return shopIsOpen;
 }
