@@ -20,11 +20,22 @@
 //     </ShopStatusProvider>
 //   );
 // }
-
+import { headers } from "next/headers";
+import { fetchTenant } from "@/utils/supabase/queries";
+import { TenantContext } from "@/contexts/tenant-context";
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div>{children}</div>;
+  const headersList = await headers();
+  const tenantId = headersList.get("x-tenant-id");
+  const tenantData = await fetchTenant(tenantId!);
+  return (
+    <div>
+      <TenantContext.Provider value={tenantData}>
+        {children}
+      </TenantContext.Provider>
+    </div>
+  );
 }
