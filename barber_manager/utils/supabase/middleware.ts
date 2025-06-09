@@ -2,9 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function getCurrentTenantId(request: NextRequest) {
-  const SLUG = "rollestonhaircuts"; // fake middleware for now. Get from subdomain later
+  const pathSegments = request.nextUrl.pathname.split("/");
+  const tenantSlug = pathSegments[1]; // First segment after /
 
-  if (!SLUG) throw new Error("Missing tenant slug");
+  if (!tenantSlug) throw new Error("Missing tenant slug");
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,7 +26,7 @@ export async function getCurrentTenantId(request: NextRequest) {
   const { data, error } = await supabase
     .from("tenants")
     .select("id")
-    .eq("slug", SLUG)
+    .eq("slug", tenantSlug)
     .single();
   if (error || !data)
     return NextResponse.redirect(new URL("/error", request.url));
