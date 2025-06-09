@@ -16,7 +16,7 @@ export default function ShopStatusProvider({
 }) {
   const [shopIsOpen, setShopIsOpen] = useState<boolean | null>(null);
 
-  // Get shop status from the client side. IMPORTANT not to mix with the sam function in queries.ts file
+  // Get shop status from the client side. IMPORTANT not to mix with the same function in queries.ts file
   async function getShopStatus(): Promise<string | any> {
     const supabase = await createClient();
     const { data, error } = await supabase

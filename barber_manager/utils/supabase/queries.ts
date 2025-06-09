@@ -45,6 +45,32 @@ export async function fetchTenantSettings(
   return data.settings as TenantSettings;
 }
 
+// Get any tenant's data
+export async function fetchTenant(
+  tenantId: Tenant["id"] | null
+): Promise<Tenant | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("tenants")
+    .select("*") // All columns
+    .eq("id", tenantId) // Filter by the tenant's ID
+    .single();
+
+  if (error) {
+    console.error("Supabase error fetching tenant data:", error.message);
+    throw new Error("Database error: Failed to retrieve tenant data.");
+  }
+
+  // If no data is found (e.g., tenantId doesn't exist), or settings is null
+  if (!data) {
+    console.warn(`No tenant found for tenant ID: ${tenantId}`);
+    return null; // Return null if no settings or tenant not found
+  }
+
+  return data as Tenant;
+}
+
 // Fetch all queue entries
 export async function getAllQueue(): Promise<QueueEntry[] | null> {
   const tenantId = await getTenantIdOrThrow();
