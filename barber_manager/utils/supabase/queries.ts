@@ -73,7 +73,7 @@ export async function fetchTenant(
 
 export async function fetchUser(userId: string): Promise<User | null> {
   const supabase = await createClient();
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("users")
     .select("*")
     .eq("id", userId)
@@ -92,10 +92,17 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
 
   const supabase = await createClient(); // Initialize your server-side Supabase client
 
+  // Also check what the query returns with explicit filtering
+  const { data: explicitQuery, error: explicitError } = await supabase
+    .from("queue")
+    .select("id, tenant_id") // Include tenant_id to see what's in there
+    .eq("tenant_id", tenantId);
+
+  console.log("Explicit tenant query result:", explicitQuery);
   // Select all necessary columns
   const { data: queue, error } = await supabase
     .from("queue")
-    .select("id, name, created_at, status, started_at, finished_at, barber_id") // Select all columns from your table
+    .select("id, name, created_at, status, started_at, finished_at, barber_id") // Select all columns from table
     .eq("tenant_id", tenantId)
     .order("created_at", { ascending: true }); // Order by creation time
 
@@ -123,23 +130,6 @@ export async function getAllCurrentStaff(): Promise<Barber[] | null> {
   }
   return staff;
 }
-
-// // Fetch available staff
-// export async function getAvailableStaff(): Promise<Barber[] | null> {
-//   const headersResult = await headers();
-//   const tenantId = headersResult.get("x-tenant-id");
-//   const supabase = await createClient();
-//   const { data: staff, error } = await supabase
-//     .from("barbers")
-//     .select("id, first_name, last_name, status")
-//     .eq("status", "onsite")
-//     .eq("tenant_id", tenantId)
-//     .order("first_name", { ascending: true });
-//   if (error) {
-//     console.error("Error fetching staff:", error.message);
-//   }
-//   return staff;
-// }
 
 // Get shop status
 export async function getShopStatus(): Promise<boolean | null> {
