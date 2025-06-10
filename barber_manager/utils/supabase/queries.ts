@@ -91,14 +91,6 @@ export async function getAllQueue(): Promise<QueueEntry[] | null> {
   const tenantId = await getTenantIdOrThrow();
 
   const supabase = await createClient(); // Initialize your server-side Supabase client
-
-  // Also check what the query returns with explicit filtering
-  const { data: explicitQuery, error: explicitError } = await supabase
-    .from("queue")
-    .select("id, tenant_id") // Include tenant_id to see what's in there
-    .eq("tenant_id", tenantId);
-
-  console.log("Explicit tenant query result:", explicitQuery);
   // Select all necessary columns
   const { data: queue, error } = await supabase
     .from("queue")

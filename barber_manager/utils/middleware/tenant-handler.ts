@@ -14,7 +14,7 @@ export const tenantHandler = async (
   // This pattern matches /<slug>/anything (e.g., /tenant1/dashboard, /tenant2/queue)
   // but excludes top-level non-tenant routes (/, /error, /sign-in, /not-found, /tenant-select)
   const isTenantSpecificAppRoute = request.nextUrl.pathname.match(
-    /^\/[^/]+\/(dashboard|queue|queue-kiosk|admin)(\/.*)?$/
+    /^\/[^/]+\/(dashboard|queue|queue-kiosk|admin|unauthorized)(\/.*)?$/
   ); // Tenant-specific route pattern
 
   // If not a tenant-specific route, just pass the response along.
