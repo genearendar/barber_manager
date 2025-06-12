@@ -8,18 +8,19 @@ export const tenantHandler = async (
   response: NextResponse
 ): Promise<NextResponse> => {
   const hostname = request.headers.get("host") || "";
-  const isLocalhost = hostname.includes("localhost");
+  const isLocalOrPreview =
+  hostname.startsWith("localhost") || hostname.endsWith(".vercel.app");
   let tenantSlug: string | null = null;
 
   // Use subdomain in production
-  if (!isLocalhost && hostname.endsWith(".myclipmate.com")) {
+  if (!isLocalOrPreview && hostname.endsWith(".myclipmate.com")) {
     tenantSlug = hostname.replace(".myclipmate.com", "");
   } else {
     // Fall back to dynamic route in dev
     const pathSegments = request.nextUrl.pathname.split("/");
     tenantSlug = pathSegments[1] || null;
   }
-  if (!isLocalhost && request.nextUrl.pathname.startsWith(`/${tenantSlug}/`)) {
+  if (!isLocalOrPreview && request.nextUrl.pathname.startsWith(`/${tenantSlug}/`)) {
     const newUrl = request.nextUrl.clone();
     newUrl.hostname = `${tenantSlug}.myclipmate.com`;
     newUrl.pathname = newUrl.pathname.replace(`/${tenantSlug}`, "");
