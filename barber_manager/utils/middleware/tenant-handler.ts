@@ -7,8 +7,24 @@ export const tenantHandler = async (
   request: NextRequest,
   response: NextResponse
 ): Promise<NextResponse> => {
-  const pathSegments = request.nextUrl.pathname.split("/");
-  const tenantSlug = pathSegments[1]; // The first segment after the root /
+  const hostname = request.headers.get("host") || "";
+  const isLocalhost = hostname.includes("localhost");
+  let tenantSlug: string | null = null;
+
+  // Use subdomain in production
+  if (!isLocalhost && hostname.endsWith(".myclipmate.com")) {
+    tenantSlug = hostname.replace(".myclipmate.com", "");
+  } else {
+    // Fall back to dynamic route in dev
+    const pathSegments = request.nextUrl.pathname.split("/");
+    tenantSlug = pathSegments[1] || null;
+  }
+  if (!isLocalhost && request.nextUrl.pathname.startsWith(`/${tenantSlug}/`)) {
+    const newUrl = request.nextUrl.clone();
+    newUrl.hostname = `${tenantSlug}.myclipmate.com`;
+    newUrl.pathname = newUrl.pathname.replace(`/${tenantSlug}`, "");
+    return NextResponse.redirect(newUrl);
+  }
 
   // Define specific routes that should resolve a tenant.
   // This pattern matches /<slug>/anything (e.g., /tenant1/dashboard, /tenant2/queue)
