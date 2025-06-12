@@ -1,69 +1,87 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-// This handler will return a NextResponse (redirect or next) if it performs an action,
-// otherwise it will just return NextResponse.next() or pass along the existing response.
+const TENANT_ROUTES =
+  /^\/(?:[^/]+\/)?(dashboard|queue|queue-kiosk|admin|unauthorized)(?:\/.*)?$/;
+
 export const tenantHandler = async (
   request: NextRequest,
   response: NextResponse
 ): Promise<NextResponse> => {
-  console.log("MW: Tenant handler");
   const hostname = request.headers.get("host") || "";
   const isLocalOrPreview =
-    hostname.startsWith("localhost") || hostname.endsWith(".vercel.app");
-  let tenantSlug: string | null = null;
+    hostname.startsWith("localhost") ||
+    hostname.endsWith(".vercel.app") ||
+    hostname.includes("127.0.0.1");
 
+  // Early exit: Not a tenant-specific route
+  if (!TENANT_ROUTES.test(request.nextUrl.pathname)) {
+    return response;
+  }
+
+  // STEP 1: Handle production redirects (dynamic → subdomain)
   if (!isLocalOrPreview) {
-    const pathSegments = request.nextUrl.pathname.split("/");
-    const potentialTenantSlug = pathSegments[1];
+    const pathSegments = request.nextUrl.pathname.split("/").filter(Boolean);
+    const potentialSlug = pathSegments[0];
 
-    // If this looks like a dynamic route, redirect to subdomain immediately
-    if (
-      potentialTenantSlug &&
-      request.nextUrl.pathname.match(
-        /^\/[^/]+\/(dashboard|queue|queue-kiosk|admin|unauthorized)(\/.*)?$/
-      )
-    ) {
+    // If we're on main domain with dynamic route, redirect to subdomain
+    if (potentialSlug && hostname === "myclipmate.com") {
       const newUrl = request.nextUrl.clone();
-      newUrl.hostname = `${potentialTenantSlug}.myclipmate.com`;
-      newUrl.pathname = newUrl.pathname.replace(`/${potentialTenantSlug}`, "");
+      newUrl.hostname = `${potentialSlug}.myclipmate.com`;
+      newUrl.pathname = `/${pathSegments.slice(1).join("/")}`;
 
-      console.log(`Redirecting to subdomain: ${newUrl.toString()}`);
       return NextResponse.redirect(newUrl);
     }
   }
 
-  // Use subdomain in production
-  if (!isLocalOrPreview && hostname.endsWith(".myclipmate.com")) {
-    tenantSlug = hostname.replace(".myclipmate.com", "");
-    console.log("MW: Tenant slug:", tenantSlug);
-  } else {
-    // Fall back to dynamic route in dev
-    const pathSegments = request.nextUrl.pathname.split("/");
-    tenantSlug = pathSegments[1] || null;
-  }
+  // STEP 2: Extract tenant slug
+  const tenantSlug = extractTenantSlug(request, isLocalOrPreview);
 
-  // Define specific routes that should resolve a tenant.
-  // This pattern matches /<slug>/anything (e.g., /tenant1/dashboard, /tenant2/queue)
-  // but excludes top-level non-tenant routes (/, /error, /sign-in, /not-found, /tenant-select)
-  const isTenantSpecificAppRoute = request.nextUrl.pathname.match(
-    /^\/[^/]+\/(dashboard|queue|queue-kiosk|admin|unauthorized)(\/.*)?$/
-  ); // Tenant-specific route pattern
-
-  // If not a tenant-specific route, just pass the response along.
-  // This avoids unnecessary DB queries for public pages.
-  if (!isTenantSpecificAppRoute) {
-    return response;
-  }
-
-  // If it's a tenant-specific route but no slug is found (shouldn't happen with regex, but good for safety)
   if (!tenantSlug) {
-    console.warn(
-      `Tenant-specific route matched but no slug found: ${request.nextUrl.pathname}. Redirecting to /not-found.`
-    );
+    console.warn(`No tenant slug found for: ${request.nextUrl.pathname}`);
     return NextResponse.redirect(new URL("/not-found", request.url));
   }
 
+  // STEP 3: Validate tenant exists
+  try {
+    const tenantId = await validateTenant(tenantSlug, request);
+
+    if (!tenantId) {
+      console.warn(`Tenant not found: ${tenantSlug}`);
+      return NextResponse.redirect(new URL("/not-found", request.url));
+    }
+
+    // STEP 4: Add tenant headers to response
+    response.headers.set("x-tenant-id", tenantId);
+    response.headers.set("x-tenant-slug", tenantSlug);
+
+    return response;
+  } catch (error) {
+    console.error(`Tenant validation error for ${tenantSlug}:`, error);
+    return NextResponse.redirect(new URL("/error", request.url));
+  }
+};
+
+function extractTenantSlug(
+  request: NextRequest,
+  isLocalOrPreview: boolean
+): string | null {
+  const hostname = request.headers.get("host") || "";
+
+  if (!isLocalOrPreview && hostname.endsWith(".myclipmate.com")) {
+    // Production subdomain: tenant1.myclipmate.com → tenant1
+    return hostname.replace(".myclipmate.com", "");
+  }
+
+  // Local/preview dynamic route: /tenant1/dashboard → tenant1
+  const pathSegments = request.nextUrl.pathname.split("/").filter(Boolean);
+  return pathSegments[0] || null;
+}
+
+async function validateTenant(
+  slug: string,
+  request: NextRequest
+): Promise<string | null> {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -72,8 +90,8 @@ export const tenantHandler = async (
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
-          // No cookie modification for this read
+        setAll() {
+          // Read-only operation
         },
       },
     }
@@ -82,19 +100,12 @@ export const tenantHandler = async (
   const { data, error } = await supabase
     .from("tenants")
     .select("id")
-    .eq("slug", tenantSlug)
+    .eq("slug", slug)
     .single();
 
   if (error || !data) {
-    console.warn(
-      `Tenant not found for slug: ${tenantSlug}. Redirecting to /not-found.`
-    );
-    return NextResponse.redirect(new URL("/not-found", request.url));
+    return null;
   }
-  // If tenant is found, set the headers on the provided response object
-  response.headers.set("x-tenant-id", data.id);
-  response.headers.set("x-tenant-slug", tenantSlug);
 
-  // Return the response with added tenant headers for the next handler.
-  return response;
-};
+  return data.id;
+}

@@ -40,6 +40,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Return the final response after all handlers have run
+  console.log("Final response:", response);
   return response;
 }
 
