@@ -19,19 +19,13 @@ export const tenantHandler = async (
     return response;
   }
 
-  // STEP 1: Handle production redirects (dynamic → subdomain)
-  if (!isLocalOrPreview) {
-    const pathSegments = request.nextUrl.pathname.split("/").filter(Boolean);
-    const potentialSlug = pathSegments[0];
+  // If on subdomain, rewrite internally to dynamic route
+  if (!isLocalOrPreview && hostname.endsWith(".myclipmate.com")) {
+    const tenantSlug = hostname.replace(".myclipmate.com", "");
+    const newUrl = request.nextUrl.clone();
+    newUrl.pathname = `/${tenantSlug}${request.nextUrl.pathname}`;
 
-    // If we're on main domain with dynamic route, redirect to subdomain
-    if (potentialSlug && hostname === "myclipmate.com") {
-      const newUrl = request.nextUrl.clone();
-      newUrl.hostname = `${potentialSlug}.myclipmate.com`;
-      newUrl.pathname = `/${pathSegments.slice(1).join("/")}`;
-
-      return NextResponse.redirect(newUrl);
-    }
+    return NextResponse.rewrite(newUrl);
   }
 
   // STEP 2: Extract tenant slug
