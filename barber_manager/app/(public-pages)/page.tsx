@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import SmartLink from "@/components/custom/smart-link";
 
 export default async function Home() {
   return (
@@ -9,10 +10,10 @@ export default async function Home() {
       </h1>
       <div className="flex gap-6">
         <Button asChild>
-          <Link href={"clipmates/queue"}>Live queue</Link>
+          <SmartLink href={"/queue"} tenantSlug="clipmates">Live queue</SmartLink>
         </Button>
         <Button asChild>
-          <Link href={"clipmates/admin"}>Admin tools</Link>
+          <SmartLink href={"/admin"} tenantSlug="clipmates">Admin tools</SmartLink>
         </Button>
       </div>
     </div>
