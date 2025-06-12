@@ -7,10 +7,31 @@ export const tenantHandler = async (
   request: NextRequest,
   response: NextResponse
 ): Promise<NextResponse> => {
+  console.log("MW: Tenant handler");
   const hostname = request.headers.get("host") || "";
   const isLocalOrPreview =
     hostname.startsWith("localhost") || hostname.endsWith(".vercel.app");
   let tenantSlug: string | null = null;
+
+  if (!isLocalOrPreview) {
+    const pathSegments = request.nextUrl.pathname.split("/");
+    const potentialTenantSlug = pathSegments[1];
+
+    // If this looks like a dynamic route, redirect to subdomain immediately
+    if (
+      potentialTenantSlug &&
+      request.nextUrl.pathname.match(
+        /^\/[^/]+\/(dashboard|queue|queue-kiosk|admin|unauthorized)(\/.*)?$/
+      )
+    ) {
+      const newUrl = request.nextUrl.clone();
+      newUrl.hostname = `${potentialTenantSlug}.myclipmate.com`;
+      newUrl.pathname = newUrl.pathname.replace(`/${potentialTenantSlug}`, "");
+
+      console.log(`Redirecting to subdomain: ${newUrl.toString()}`);
+      return NextResponse.redirect(newUrl);
+    }
+  }
 
   // Use subdomain in production
   if (!isLocalOrPreview && hostname.endsWith(".myclipmate.com")) {
@@ -73,19 +94,6 @@ export const tenantHandler = async (
   // If tenant is found, set the headers on the provided response object
   response.headers.set("x-tenant-id", data.id);
   response.headers.set("x-tenant-slug", tenantSlug);
-
-  // 🔁 Redirect dynamic route to subdomain in production
-  if (
-    !isLocalOrPreview &&
-    request.nextUrl.pathname.startsWith(`/${tenantSlug}/`)
-  ) {
-    const newUrl = request.nextUrl.clone();
-    newUrl.hostname = `${tenantSlug}.myclipmate.com`;
-    newUrl.pathname = newUrl.pathname.replace(`/${tenantSlug}`, "");
-
-    console.log(`Redirecting to subdomain: ${newUrl.toString()}`);
-    return NextResponse.redirect(newUrl);
-  }
 
   // Return the response with added tenant headers for the next handler.
   return response;
