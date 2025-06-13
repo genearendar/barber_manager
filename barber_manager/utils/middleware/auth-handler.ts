@@ -46,7 +46,7 @@ export const authHandler = async (
   }
 
   // --- Protected Route Check ---
-  // This regex matches /<tenantSlug>/admin or /<tenantSlug>/admin/...
+  // Any /admin routes or /onboarding routes
   const isProtectedAdminRoute = request.nextUrl.pathname.match(
     /^(?:\/[^/]+\/admin(\/.*)?|\/onboarding(\/.*)?)$/
   );

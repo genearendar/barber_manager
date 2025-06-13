@@ -2,6 +2,8 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { createClient } from "./server";
+import { z } from "zod";
+import { redirect } from "next/navigation";
 import {
   getShopStatus,
   fetchTenantSettings,
@@ -206,4 +208,78 @@ export async function toggleShopStatus(): Promise<ServerActionReturn> {
     console.error("Error updating status:", error);
     return { success: false, message: "Failed to update status." };
   }
+}
+
+export async function createTenantAction(
+  prevState: any,
+  formData: FormData
+): Promise<ServerActionReturn> {
+  const formSchema = z.object({
+    name: z.string().min(2),
+    slug: z
+      .string()
+      .min(3)
+      .max(30)
+      .regex(/^[a-z0-9\-]+$/, {
+        message: "Slug must be lowercase, alphanumeric or hyphen",
+      }),
+  });
+
+  const supabase = createClient();
+
+  const name = formData.get("name")?.toString() || "";
+  const slug = formData.get("slug")?.toString() || "";
+  const parsed = formSchema.safeParse({ name, slug });
+
+  if (!parsed.success) {
+    return { message: parsed.error.errors[0].message };
+  }
+
+  // check if user is signed in
+  const userRes = await supabase.auth.getUser();
+  const user = userRes.data.user;
+
+  if (!user) {
+    return { message: "User not found. Please sign in again." };
+  }
+
+  // check if slug already exists
+  const { data: existing, error: fetchError } = await supabase
+    .from("tenants")
+    .select("id")
+    .eq("slug", slug)
+    .single();
+
+  if (existing) {
+    return { message: "Slug already taken. Choose another one." };
+  }
+
+  // insert new tenant
+  const { data, error } = await supabase
+    .from("tenants")
+    .insert({
+      name,
+      slug,
+      owner_user_id: user.id,
+    })
+    .select()
+    .single();
+
+  if (error || !data) {
+    console.error("Insert tenant error:", error);
+    return { message: "Something went wrong. Try again later." };
+  }
+
+  // link user to tenant (optional step, if needed)
+  await supabase.from("tenant_members").insert({
+    tenant_id: data.id,
+    user_id: user.id,
+    role: "owner",
+  });
+
+  // Optionally revalidate any paths here if needed
+  revalidatePath("/");
+
+  // Redirect to their new dashboard
+  redirect(`https://${slug}.myclipmate.com/dashboard`);
 }

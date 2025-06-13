@@ -64,7 +64,7 @@ export const signInAction = async (formData: FormData) => {
   const userTenant = await fetchTenant(userData.tenant_id);
   return userTenant
     ? redirect(`/${userTenant.slug}/queue`)
-    : redirect("/error");
+    : redirect("/onboarding");
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {
