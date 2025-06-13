@@ -6,7 +6,6 @@ import { type NextRequest, NextResponse } from "next/server";
 export const authHandler = async (
   request: NextRequest
 ): Promise<NextResponse> => {
-  console.log("MW: Auth handler");
   // Create a modifiable response object that will eventually be returned.
   // This ensures cookies set by Supabase are applied to _this_ response.
   let response = NextResponse.next({
@@ -49,7 +48,7 @@ export const authHandler = async (
   // --- Protected Route Check ---
   // This regex matches /<tenantSlug>/admin or /<tenantSlug>/admin/...
   const isProtectedAdminRoute = request.nextUrl.pathname.match(
-    /^\/[^/]+\/admin(\/.*)?$/
+    /^(?:\/[^/]+\/admin(\/.*)?|\/onboarding(\/.*)?)$/
   );
 
   // If on a protected admin route and user is NOT authenticated
