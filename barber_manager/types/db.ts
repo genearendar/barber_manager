@@ -12,6 +12,12 @@ export const USER_ROLE = {
   CUSTOMER: "customer",
 } as const;
 
+export const TENANT_STATUS = {
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  INCOMPLETE: "incomplete",
+} as const;
+
 export const QUEUE_STATUS = {
   WAITING: "waiting",
   IN_PROGRESS: "in progress",
@@ -26,11 +32,13 @@ export const TABLE_NAMES = {
   USERS: "users",
 } as const;
 
+
 // ===== TYPE UNIONS =====
 export type BarberStatus = (typeof BARBER_STATUS)[keyof typeof BARBER_STATUS];
 export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
 export type QueueStatus = (typeof QUEUE_STATUS)[keyof typeof QUEUE_STATUS];
 export type TableName = (typeof TABLE_NAMES)[keyof typeof TABLE_NAMES];
+export type TenantStatus = (typeof TENANT_STATUS)[keyof typeof TENANT_STATUS];
 
 //===== MAIN TYPES  =====
 
@@ -38,7 +46,7 @@ export type Tenant = {
   id: string; // uuid
   name: string;
   slug: string | null;
-  is_active: boolean;
+  status: TenantStatus;
   created_at: string;
   updated_at: string;
   settings: Record<string, any>; // jsonb

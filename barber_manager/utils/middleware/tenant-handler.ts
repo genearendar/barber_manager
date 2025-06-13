@@ -9,7 +9,7 @@ export const tenantHandler = async (
 ): Promise<NextResponse> => {
   const hostname = request.headers.get("host") || "";
   const isLocalOrPreview =
-  hostname.startsWith("localhost") || hostname.endsWith(".vercel.app");
+    hostname.startsWith("localhost") || hostname.endsWith(".vercel.app");
   let tenantSlug: string | null = null;
 
   // Use subdomain in production
@@ -20,7 +20,10 @@ export const tenantHandler = async (
     const pathSegments = request.nextUrl.pathname.split("/");
     tenantSlug = pathSegments[1] || null;
   }
-  if (!isLocalOrPreview && request.nextUrl.pathname.startsWith(`/${tenantSlug}/`)) {
+  if (
+    !isLocalOrPreview &&
+    request.nextUrl.pathname.startsWith(`/${tenantSlug}/`)
+  ) {
     const newUrl = request.nextUrl.clone();
     newUrl.hostname = `${tenantSlug}.myclipmate.com`;
     newUrl.pathname = newUrl.pathname.replace(`/${tenantSlug}`, "");
