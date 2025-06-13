@@ -23,13 +23,10 @@ export default function SmartLink({
   // Use useEffect to access window.location.host only when the component is mounted in the browser.
   useEffect(() => {
     setCurrentHost(window.location.host);
-  }, []); // Empty dependency array means this effect runs once after the initial render.
-
+  }, []); 
   let smartHref: string;
 
   // Determine if the current environment is a subdomain-based production environment.
-  // This check relies on `currentHost` being populated.
-  // During SSR, `currentHost` will be an empty string, so `isSubdomainEnvironment` will be `false`.
   const isSubdomainEnvironment =
     currentHost.endsWith(".myclipmate.com") &&
     currentHost !== "myclipmate.com" &&
@@ -42,9 +39,7 @@ export default function SmartLink({
     // We ensure it starts with a '/' for consistency.
     smartHref = href.startsWith("/") ? href : `/${href}`;
   } else {
-    // If not in a subdomain environment (i.e., localhost during dev, or myclipmate.com root domain)
-    // We assume a path-based tenant structure here if `tenantSlug` is provided.
-    // This part is critical for SSR as well, where `isSubdomainEnvironment` is false.
+    // If not in a subdomain environment (e.g., localhost or preview)    
     if (tenantSlug) {
       // Ensure href starts with a slash, then prepend tenantSlug
       const cleanHref = href.startsWith("/") ? href : `/${href}`;
