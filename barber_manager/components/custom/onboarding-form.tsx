@@ -1,9 +1,10 @@
 "use client";
 import { useActionState } from "react";
 import { createTenant } from "@/utils/supabase/actions";
+import { ServerActionReturn } from "@/types/db";
 
 export default function OnboardingForm() {
-  const [state, formAction] = useActionState(createTenant, null);
+  const [state, formAction, isLoading] = useActionState(createTenant, null);
   return (
     <form action={formAction} className="space-y-4">
       <div>
