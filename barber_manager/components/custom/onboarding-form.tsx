@@ -3,7 +3,7 @@ import { useActionState } from "react";
 import { createTenant } from "@/utils/supabase/actions";
 
 export default function OnboardingForm() {
-  const [state, formAction] = useActionState(createTenant, { message: null });
+  const [state, formAction] = useActionState(createTenant, null);
   return (
     <form action={formAction} className="space-y-4">
       <div>

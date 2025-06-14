@@ -211,7 +211,7 @@ export async function toggleShopStatus(): Promise<ServerActionReturn> {
 }
 
 export async function createTenant(
-  prevState: Promise<ServerActionReturn>,
+  prevState: ServerActionReturn | null,
   formData: FormData,
 ): Promise<ServerActionReturn> {
   const formSchema = z.object({
