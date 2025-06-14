@@ -14,7 +14,7 @@ import { Barber, QueueStatus, TableName, ServerActionReturn } from "@/types/db";
 // Add a new queue entry
 export async function addToQueue(
   formState: ServerActionReturn | null,
-  formData: FormData
+  formData: FormData,
 ): Promise<ServerActionReturn> {
   const supabase = await createClient();
 
@@ -80,7 +80,7 @@ export async function addToQueue(
 // Assign a barber to a queue entry
 export async function assignBarberToQueueEntry(
   queueEntryId: string,
-  barberId: string
+  barberId: string,
 ): Promise<ServerActionReturn> {
   const tenantId = await getTenantIdOrThrow();
   // Assign barberId to null in case it's not provided
@@ -108,7 +108,7 @@ export async function assignBarberToQueueEntry(
 // Update service status
 export async function updateServiceStatus(
   queueEntryId: string,
-  newStatus: string
+  newStatus: string,
 ): Promise<ServerActionReturn> {
   const supabase = await createClient();
   const tenantId = await getTenantIdOrThrow();
@@ -153,7 +153,7 @@ export async function updateServiceStatus(
 // Toggle staff status
 export async function toggleStaffStatus(
   staffId: string,
-  newStatus: string
+  newStatus: string,
 ): Promise<ServerActionReturn> {
   const tenantId = await getTenantIdOrThrow();
   try {
@@ -210,9 +210,9 @@ export async function toggleShopStatus(): Promise<ServerActionReturn> {
   }
 }
 
-export async function createTenantAction(
-  prevState: any,
-  formData: FormData
+export async function createTenant(
+  prevState: Promise<ServerActionReturn>,
+  formData: FormData,
 ): Promise<ServerActionReturn> {
   const formSchema = z.object({
     name: z.string().min(2),
@@ -225,14 +225,17 @@ export async function createTenantAction(
       }),
   });
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const name = formData.get("name")?.toString() || "";
   const slug = formData.get("slug")?.toString() || "";
   const parsed = formSchema.safeParse({ name, slug });
 
   if (!parsed.success) {
-    return { message: parsed.error.errors[0].message };
+    return {
+      success: false,
+      message: parsed.error.errors[0].message,
+    };
   }
 
   // check if user is signed in
@@ -240,7 +243,10 @@ export async function createTenantAction(
   const user = userRes.data.user;
 
   if (!user) {
-    return { message: "User not found. Please sign in again." };
+    return {
+      success: false,
+      message: "User not found. Please sign in again.",
+    };
   }
 
   // check if slug already exists
@@ -251,35 +257,55 @@ export async function createTenantAction(
     .single();
 
   if (existing) {
-    return { message: "Slug already taken. Choose another one." };
+    return {
+      success: false,
+      message: "Slug already taken. Choose another one.",
+    };
   }
 
   // insert new tenant
   const { data, error } = await supabase
     .from("tenants")
     .insert({
-      name,
-      slug,
+      name: name,
+      slug: slug,
+      status: "active",
       owner_user_id: user.id,
+      settings: {
+        is_open: false,
+      },
     })
     .select()
     .single();
 
   if (error || !data) {
     console.error("Insert tenant error:", error);
-    return { message: "Something went wrong. Try again later." };
+    return {
+      success: false,
+      message: "Something went wrong. Try again later.",
+    };
   }
 
   // link user to tenant (optional step, if needed)
-  await supabase.from("tenant_members").insert({
-    tenant_id: data.id,
-    user_id: user.id,
-    role: "owner",
-  });
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .update({
+      tenant_id: data.id,
+    })
+    .eq("id", user.id)
+    .select()
+    .single();
+  if (userError || !userData) {
+    console.error("Insert user error:", userError);
+    return {
+      success: false,
+      message: "Unable to add tenant_id to user.",
+    };
+  }
 
   // Optionally revalidate any paths here if needed
   revalidatePath("/");
 
-  // Redirect to their new dashboard
-  redirect(`https://${slug}.myclipmate.com/dashboard`);
+  // Redirect to their new admin page
+  redirect(`https://${slug}.myclipmate.com/admin`);
 }

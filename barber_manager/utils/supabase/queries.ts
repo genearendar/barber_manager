@@ -6,7 +6,6 @@ import { QueueEntry, Barber, TenantSettings, Tenant, User } from "@/types/db";
 export async function getTenantIdOrThrow(): Promise<Tenant["id"]> {
   const headersResult = await headers();
   const tenantId = headersResult.get("x-tenant-id");
-  console.log("Tenant ID:", tenantId);
   if (!tenantId) {
     throw new Error(
       "Missing tenant ID. This operation requires tenant context."

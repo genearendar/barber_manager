@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { toggleShopStatus } from "@/utils/supabase/actions";
 import useShopStatus from "@/hooks/use-shop-status";
 import useAsyncAction from "@/hooks/use-async-action";
@@ -13,35 +12,6 @@ export default function OpenCloseShopButton() {
     isSuccess,
     message,
   } = useAsyncAction(toggleShopStatus);
-
-  // const handleToggle = async () => {
-  //   if (isLoading) return;
-  //   setIsLoading(true);
-  //   setMessage(null);
-
-  //   try {
-  //     const result = await toggleShopStatus();
-
-  //     if (result.success) {
-  //       setMessage(result.message); // Success message
-  //       // Message will auto-clear when context updates
-  //       setTimeout(() => setMessage(null), 1000);
-  //     } else {
-  //       setMessage(result.message); // Error message
-  //     }
-  //   } catch (err) {
-  //     setMessage("Something went wrong");
-  //     console.error("Unexpected error:", err);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // if (shopIsOpen === null) {
-  //   return <Button disabled>Loading...</Button>;
-  // }
-
-  // const isOpen = shopIsOpen === "yes";
   console.log("shopIsOpen", shopIsOpen);
   return (
     <div className="space-y-2">
