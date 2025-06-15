@@ -38,17 +38,21 @@ export default async function Home() {
         <div className="grow">
           <div className="flex gap-4 items-center mb-1">
             <X size={24} color="#ff0000" className="flex-none" />
+            <p className="text-md font-normal">How long’s the wait?</p>
+          </div>
+          <div className="flex gap-4 items-center mb-1">
+            <X size={24} color="#ff0000" className="flex-none" />
+            <p className="text-md font-normal">Hey mate, write me down!</p>
+          </div>
+          <div className="flex gap-4 items-center mb-1">
+            <X size={24} color="#ff0000" className="flex-none" />
             <p className="text-md font-normal">
               Can I request a specific barber?
             </p>
           </div>
-          <div className="flex gap-4 items-center mb-1">
-            <X size={24} color="#ff0000" className="flex-none" />
-            <p className="text-md font-normal">How long’s the wait?</p>
-          </div>
           <div className="flex gap-4 items-center">
             <X size={24} color="#ff0000" className="flex-none" />
-            <p className="text-md font-normal">Hey mate, write me down!</p>
+            <p className="text-md font-normal">That guy just cut the queue!</p>
           </div>
         </div>
       </section>
@@ -61,7 +65,7 @@ export default async function Home() {
             digital queue for walk-in barbers that lets you focus on cutting,
             not on chaos
           </h3>
-          <div className="grow">
+          {/* <div className="grow">
             <div className="flex gap-4 items-center mb-2">
               <CircleCheckBig color="#AA8EDB" />
               <p className="text-md font-normal">No appointments</p>
@@ -78,7 +82,7 @@ export default async function Home() {
               <CircleCheckBig color="#AA8EDB" />
               <p className="text-md font-normal">No BS</p>
             </div>
-          </div>
+          </div> */}
           <div className="card-group flex flex-col gap-6 items-center mt-8">
             <div className="card w-5/6 p-8 bg-white border border-amber-200 text-center ">
               <h3 className="text-xl font-bold mb-4">No more yelling names</h3>
