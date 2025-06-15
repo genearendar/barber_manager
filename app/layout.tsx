@@ -1,10 +1,7 @@
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { Geist } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { headers } from "next/headers";
-import Header from "@/components/custom/header";
+
 import "./globals.css";
-import ShopStatusProvider from "@/contexts/shop-status-context";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -16,9 +13,10 @@ export const metadata = {
   description: "Barbershop Queue Management App",
 };
 
-const geistSans = Geist({
+const geistSans = Bricolage_Grotesque({
   display: "swap",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export default async function RootLayout({

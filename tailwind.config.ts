@@ -8,6 +8,14 @@ const config = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
+  safelist: [
+    "text-5xl",
+    "text-3xl",
+    "text-2xl",
+    "text-xl",
+    "w-4/5",
+    // Add any other missing classes you discover
+  ],
   prefix: "",
   theme: {
     container: {
@@ -24,6 +32,7 @@ const config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        l_purple: "hsl(var(--bg-l-purple))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

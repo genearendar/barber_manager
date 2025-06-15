@@ -7,7 +7,7 @@ export default async function RootLayout({
 }>) {
   return (
     <div className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full max-w-7xl flex flex-col gap-20 items-center px-5 lg:px-16">
+      <div className="flex-1 w-full flex flex-col gap-20 items-center">
         <Header />
         <main className="w-full flex flex-col gap-20">{children}</main>
       </div>
