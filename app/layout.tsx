@@ -1,6 +1,5 @@
 import { Bricolage_Grotesque } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 
@@ -10,9 +9,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "MyClipmate: the fix for walk-in queue chaos",
-  description:
-    "Barbershop queueing made easy, with zero disruptions to how you already work.",
+  title: "Barbershop Queue Management App",
+  description: "Barbershop Queue Management App",
 };
 
 const geistSans = Bricolage_Grotesque({
