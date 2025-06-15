@@ -153,6 +153,66 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      <section className="bg-l_purple py-12">
+        <div className="container flex flex-col items-center">
+          <h2 className="mb-4 text-4xl font-semibold text-center">
+            Your walk-in shop deserves less chaos
+          </h2>
+          <h3 className="max-w-3xl mb-6 text-xl font-normal text-center">
+            You don’t need to overhaul your system. Just give it the calm it’s
+            been missing
+          </h3>
+          <h3 className="max-w-3xl mb-6 text-xl font-normal text-center">
+            Start now — your smarter queue is waiting
+          </h3>
+        </div>
+      </section>
+      <section className="py-12">
+        <div className="container flex flex-col items-center">
+          <h2 className="mb-4 text-4xl font-semibold text-center">
+            Still running the queue like this a year from now?
+          </h2>
+          <h3 className="max-w-3xl mb-6 text-xl font-normal text-center">
+            Every day you wait, you're bleeding time, patience, and customers.
+          </h3>
+          <div className="flex flex-col gap-4">
+            <div className="bg-red-100 bg-opacity-50 p-2 pl-6 rounded-lg border-l-4 border-red-500">
+              <span className="text-xl font-semibold text-red-500 mr-2">!</span>
+              The shouting makes you look disorganised and unprofessional.
+            </div>
+            <div className="bg-red-100 bg-opacity-50 p-2 pl-6 rounded-lg border-l-4 border-red-500">
+              <span className="text-xl font-semibold text-red-500 mr-2">!</span>{" "}
+              The frustration builds until it turns into burnout.
+            </div>
+            <div className="bg-red-100 bg-opacity-50 p-2 pl-6 rounded-lg border-l-4 border-red-500">
+              <span className="text-xl font-semibold text-red-500 mr-2">!</span>{" "}
+              The 5pm exhaustion drains the joy out of cutting.
+            </div>
+            <div className="bg-red-100 bg-opacity-50 p-2 pl-6 rounded-lg border-l-4 border-red-500">
+              <span className="text-xl font-semibold text-red-500 mr-2">!</span>{" "}
+              The walk-outs cost you money and reputation.
+            </div>
+            <div className="bg-red-100 bg-opacity-50 p-2 pl-6 rounded-lg border-l-4 border-red-500">
+              <span className="text-xl font-semibold text-red-500 mr-2">!</span>{" "}
+              The team tension turns busy days into war zones.
+            </div>
+            <div className="bg-red-100 bg-opacity-50 p-2 pl-6 rounded-lg border-l-4 border-red-500">
+              <span className="text-xl font-semibold text-red-500 mr-2">!</span>{" "}
+              The digital competitors look slick while you scramble.
+            </div>
+            <h3 className="max-w-3xl mt-4  text-xl text-red-900 font-bold text-center">
+              Don’t wait for another messy day to push you over the edge.
+            </h3>
+          </div>{" "}
+          <p className="mt-4 text-center">
+            Start your free trial and get back to focusing on the cuts — not the
+            queue.
+          </p>
+          <Button size="lg" className="text-lg rounded-full mt-6">
+            Deal with the chaos now
+          </Button>
+        </div>
+      </section>
     </div>
   );
 }
