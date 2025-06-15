@@ -1,0 +1,8 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.server.logLevel": "verbose",
+  "github.copilot.nextEditSuggestions.fixes": false,
+  "editor.experimentalNextEditSuggestions.enabled": false
+}

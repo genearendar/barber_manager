@@ -38,7 +38,9 @@ export default function OnboardingForm() {
         </p>
       </div>
 
-      {state?.message && <p className="text-red-600 text-sm">{state.message}</p>}
+      {state?.message && (
+        <p className="text-red-600 text-sm">{state.message}</p>
+      )}
 
       <button
         type="submit"
